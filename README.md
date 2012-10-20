@@ -1,4 +1,4 @@
 evilreader
 ==========
 
-it will bethe best eBook reader in the world
+it will be the best eBook reader in the world
