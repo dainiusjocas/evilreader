@@ -1,6 +1,10 @@
-package com.evilreader.android;
+package com.evilreader.android.epubcontentcontrol;
 
-import com.evilreader.android.ContentProviders.EbookFileManager;
+import com.evilreader.android.R;
+import com.evilreader.android.R.id;
+import com.evilreader.android.R.layout;
+import com.evilreader.android.R.menu;
+import com.evilreader.android.R.raw;
 
 import android.os.Bundle;
 import android.app.Activity;

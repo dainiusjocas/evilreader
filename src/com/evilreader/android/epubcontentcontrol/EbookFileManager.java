@@ -1,4 +1,4 @@
-package com.evilreader.android.ContentProviders;
+package com.evilreader.android.epubcontentcontrol;
 
 import java.io.InputStream;
 import java.util.HashMap;
