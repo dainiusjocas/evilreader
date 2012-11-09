@@ -1,50 +1,87 @@
 package com.evilreader.android;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.domain.Spine;
-import nl.siegmann.epublib.domain.SpineReference;
-
 import com.evilreader.android.ContentProviders.EbookFileManager;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.view.DragEvent;
 import android.view.Menu;
+import android.view.View;
 import android.webkit.WebView;
+import android.widget.Button;
 
 public class EpubContentActivity extends Activity {
+	//private constants
+	private final int resourceIDSample = R.raw.asd;
+	
 	//private members
-	public String someText = "";
-
+	private WebView webviewPage1;
+	private int currentChapterIndex;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_epub_content);
         
-        EbookFileManager ebookFileManager = new EbookFileManager();
+        webviewPage1 = (WebView) findViewById(R.id.webView1);
+        webviewPage1.setOnDragListener(new View.OnDragListener() {
+			
+			public boolean onDrag(View v, DragEvent event) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+		});
         
-        Book book = ebookFileManager.AddEpubFileToEbookList(getResources().openRawResource(R.raw.asd));
+        EbookFileManager instance = EbookFileManager.getInstance();
+        instance.Init(getApplicationContext());
+        try {
+			instance.LoadBookByResourceID(resourceIDSample);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
-        Spine spine = book.getSpine();
+        String chapterContent = instance.GetEpubBookChapterContentByChapterNumber(resourceIDSample, currentChapterIndex);
         
-        for (SpineReference bookSection : spine.getSpineReferences()) {
-            Resource res = bookSection.getResource();
-                try {
-                    InputStream is = res.getInputStream();
-                    java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-                    someText += s.hasNext() ? s.next() : "";
-                    //do something with stream
-                } catch (IOException e) {
-                }               
+        if(chapterContent != null || chapterContent != ""){
+	        webviewPage1.setClickable(true);
+	        webviewPage1.loadData(chapterContent, "text/html", null);
         }
+                
+        //The button for going through chapters forward
+        final Button button1 = (Button) findViewById(R.id.button1);
+        button1.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                currentChapterIndex++;
+                
+                String chapterContent = EbookFileManager.getInstance().GetEpubBookChapterContentByChapterNumber(resourceIDSample, currentChapterIndex);
+                
+                if(chapterContent != null || chapterContent != ""){
+        	        webviewPage1.setClickable(true);
+        	        webviewPage1.loadData(chapterContent, "text/html", null);
+                }
+            }
+        });
         
-        WebView webview = new WebView(this);
-        webview.setClickable(true);
-        webview.loadData(someText, "text/html", null);
-        setContentView(webview);
+      //The button for going through chapters backward
+        final Button button2 = (Button) findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				if(currentChapterIndex > 0)
+				{
+					currentChapterIndex--;
+					
+					String chapterContent = EbookFileManager.getInstance().GetEpubBookChapterContentByChapterNumber(resourceIDSample, currentChapterIndex);
+	                
+	                if(chapterContent != null || chapterContent != ""){
+	        	        webviewPage1.setClickable(true);
+	        	        webviewPage1.loadData(chapterContent, "text/html", null);
+	                }
+				}
+				
+			}
+		});
     }
 
     @Override
