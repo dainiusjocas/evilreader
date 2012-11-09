@@ -15,8 +15,8 @@ public class EbookFileManager {
 	private HashMap<String,Book> currentEBookList;	
 		
 	public EbookFileManager()
-	{			
-		
+	{
+		hipo
 	}
 	
 	private void DownloadFile(Uri url)

@@ -5,5 +5,6 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_epub_content">EpubContentActivity</string>
+    <string name="no_notes">There is no notes! Make one!</string>
 
 </resources>

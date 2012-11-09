@@ -4,7 +4,7 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:id="@+id/testEpubView"
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -14,7 +14,21 @@
         android:maxLines="300"
         android:scrollbars="vertical"
         android:text="@string/hello_world"
-        tools:context=".MainActivity" />
+        tools:context=".MainActivity"
+        android:textIsSelectable="true" />
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textView1"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_marginBottom="104dp"
+        android:ems="10"
+        android:inputType="textMultiLine">
+
+        <requestFocus />
+    </EditText>
 
 		<!-- <WebView android:id="@+id/testEpubWebView"
 		android:layout_alignParentBottom="true"
