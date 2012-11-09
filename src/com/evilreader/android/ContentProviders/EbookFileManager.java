@@ -16,7 +16,7 @@ public class EbookFileManager {
 		
 	public EbookFileManager()
 	{
-		hipo
+		
 	}
 	
 	private void DownloadFile(Uri url)
