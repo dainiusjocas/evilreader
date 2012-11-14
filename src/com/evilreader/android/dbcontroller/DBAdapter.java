@@ -25,7 +25,7 @@ import android.util.Log;
  */
 public class DBAdapter {
 	/*
-	 * Names and definitions for a DB.
+	 * Names and definitions for the EvilReader DB.
 	 */
 	public static final String DATABASE_NAME = "evilreaderdb";
 	public static final int DATABASE_VERSION = 1;
@@ -33,31 +33,81 @@ public class DBAdapter {
 	/*
 	 * Name definitions for Notes table. For only one table for now.
 	 */
-	public static final String NOTES_TABLE_TITLE = "notes";
-	public static final String NOTES_ROWID = "notes_id";
-	public static final String NOTES_BODY  = "body";
-	public static final String NOTES_BOOK_ID = "book_id";
-	/* 
-	 * TODO(dainius): maybe it would be good somehow to relate a note with 
-	 * specific location in an ebook? I think it makes sense.
+	public static final String NOTE_TABLE_TITLE = "note";
+	public static final String NOTE_ROWID = "rowid";
+	public static final String NOTE_BODY  = "body";
+	public static final String NOTE_BOOK_ID = "book_id";
+	public static final String NOTE_LOCATION_ID = "location_id";
+	private static final String DATABASE_CREATE_NOTES =
+	        "create table " 
+	        + NOTE_TABLE_TITLE 
+	        + " ( "
+	        + NOTE_ROWID
+	        + " integer primary key autoincrement, "
+	        + NOTE_BODY
+	        + " text not null, "
+	        + NOTE_BOOK_ID 
+	        + " text not null, "
+	        + NOTE_LOCATION_ID
+	        + " text not null);";
+	
+	/*
+	 * Possible definition for a LOCATION table.
+	 * 
+	 * LOCATION_FIRST_WORD_NUMBER caption the exact location of an object
+	 * related with an ebook. For example, I highlighted two words in a book, 
+	 * so, my highlight started at the 5th word of the specific paragraph and
+	 * length of selection was two words.
+	 * 
+	 * Other columns in my opinion are self explainable
 	 */
+	public static final String LOCATION_TABLE_TITLE = "location";
+	// what if object will be deleted? Nothing reader will not take the record
+	// into consideration.
+	public static final String LOCATION_ROWID = "rowid";
+	public static final String LOCATION_BOOK_ID = "book_id";
+	public static final String LOCATION_CHAPTER_NUMBER = "chapter_number";
+	public static final String LOCATION_PARAGRAPH_NUMBER = "paragraph_number";
+	public static final String LOCATION_FIRST_WORD_NUMBER = "first_word_number";
+	// LENGTH_OF_SELECTION is in words because it may span multiple paragraphs
+	public static final String LOCATION_LENGTH_OF_SELECTION = "length_of_selection";
+	private static final String DATABASE_CREATE_LOCATION = 
+			"create table "
+			+ LOCATION_TABLE_TITLE
+			+ " ( "
+			+ LOCATION_ROWID
+			+ " integer primary key autoincrement, "
+			+ LOCATION_BOOK_ID
+			+ " text not null, "
+			+ LOCATION_CHAPTER_NUMBER
+			+ " text not null, "
+			+ LOCATION_PARAGRAPH_NUMBER
+			+ " text not null, "
+			+ LOCATION_FIRST_WORD_NUMBER
+			+ " text not null, "
+			+ LOCATION_LENGTH_OF_SELECTION
+			+ " text not null);";
+	
 	
 	//TODO(dainius): describe all the tables;
 	//TODO(dainius): add code for all the table handlers. 
 	
 	/**
      * Database creation sql statement. For now its just one table NOTES!
+     * TODO(dainius): rewrite for multitable case;
      */
     private static final String DATABASE_CREATE =
         "create table " 
-        + NOTES_TABLE_TITLE 
+        + NOTE_TABLE_TITLE 
         + " ( "
-        + NOTES_ROWID
+        + NOTE_ROWID
         + " integer primary key autoincrement, "
-        + NOTES_BODY
+        + NOTE_BODY
         + " text not null, "
-        + NOTES_BOOK_ID 
+        + NOTE_BOOK_ID 
         + " text not null);";
+    
+    
 	
 	private static final String TAG = "DBAdapter";
 	private DatabaseHelper mDbHelper;
@@ -119,7 +169,7 @@ public class DBAdapter {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
-            db.execSQL("DROP TABLE IF EXISTS " + NOTES_TABLE_TITLE);
+            db.execSQL("DROP TABLE IF EXISTS " + NOTE_TABLE_TITLE);
             onCreate(db);
         }
     }
@@ -137,11 +187,12 @@ public class DBAdapter {
      * @param bookId - to which book note is assigned
      * @return rowId or -1 if failed
      */
-    public long createNote(String body, String bookId) {
+    public long storeNote(String body, String bookId, String location_id) {
     	ContentValues initialValues = new ContentValues();
-    	initialValues.put(NOTES_BODY, body);
-    	initialValues.put(NOTES_BOOK_ID, bookId);
-    	return mDb.insert(NOTES_TABLE_TITLE, null, initialValues);
+    	initialValues.put(NOTE_BODY, body);
+    	initialValues.put(NOTE_BOOK_ID, bookId);
+    	initialValues.put(NOTE_LOCATION_ID, location_id);
+    	return mDb.insert(NOTE_TABLE_TITLE, null, initialValues);
     }
     
     /**
@@ -150,7 +201,7 @@ public class DBAdapter {
      * @return true if success, otherwise - false
      */
     public boolean deleteNote(long rowId) {
-    	return mDb.delete(NOTES_TABLE_TITLE, NOTES_BOOK_ID + "=" + rowId,
+    	return mDb.delete(NOTE_TABLE_TITLE, NOTE_BOOK_ID + "=" + rowId,
     			null) > 0;
     }
     
@@ -159,9 +210,9 @@ public class DBAdapter {
      * @return cursor over all selected notes for a specific book.
      */
     public Cursor fetchAllNotes(long bookId) {
-    	Cursor cursor = mDb.query(NOTES_TABLE_TITLE,
-    			new String[] {NOTES_ROWID, NOTES_BODY},
-    			NOTES_BOOK_ID + "=" + bookId, null, null, null,
+    	Cursor cursor = mDb.query(NOTE_TABLE_TITLE,
+    			new String[] {NOTE_ROWID, NOTE_BODY, NOTE_LOCATION_ID},
+    			NOTE_BOOK_ID + "=" + bookId, null, null, null,
     			null);
     	return cursor;
     }
@@ -174,9 +225,9 @@ public class DBAdapter {
      * @throws SQLException if note cannot be found/retrieved
      */
     public Cursor fetchNote(long noteId) throws SQLException {
-    	Cursor mCursor = mDb.query(NOTES_TABLE_TITLE, 
-    			new String[] {NOTES_ROWID, NOTES_BODY},
-    			NOTES_ROWID + "=" + noteId, null, null, null, null);
+    	Cursor mCursor = mDb.query(NOTE_TABLE_TITLE, 
+    			new String[] {NOTE_ROWID, NOTE_BODY},
+    			NOTE_ROWID + "=" + noteId, null, null, null, null);
     	if (mCursor != null) {
     		mCursor.moveToFirst();
     	}
@@ -192,11 +243,36 @@ public class DBAdapter {
      * @return isSuccess - true when update was successful, otherwise false
      */
     public boolean updateNote(long noteId, String body) {
-    	ContentValues args = new ContentValues();
-    	args.put(NOTES_BODY, body);
-    	boolean isSuccess = mDb.update(NOTES_TABLE_TITLE, args,
-    			NOTES_ROWID + "=" + noteId, null) > 0;
+    	ContentValues content_values = new ContentValues();
+    	content_values.put(NOTE_BODY, body);
+    	boolean isSuccess = mDb.update(NOTE_TABLE_TITLE, content_values,
+    			NOTE_ROWID + "=" + noteId, null) > 0;
     	return isSuccess;
     }
     /*************************************************************************/
+    
+    /**************************************************************************
+     * TODO(dainius) create controllers for LOCATIONS table.
+     *************************************************************************/
+    
+    /**
+     * §
+     * @param book_id
+     * @param chapterNumber
+     * @param paragraphNumber
+     * @param firstWordNumber
+     * @param lengthOfSelection
+     * @return
+     */
+    public long storeLocation(String book_id, String chapterNumber, 
+    		String paragraphNumber, String firstWordNumber,
+    		String lengthOfSelection) {
+    	ContentValues contentValues = new ContentValues();
+    	contentValues.put(LOCATION_BOOK_ID, book_id);
+    	contentValues.put(LOCATION_CHAPTER_NUMBER, chapterNumber);
+    	contentValues.put(LOCATION_PARAGRAPH_NUMBER, paragraphNumber);
+    	contentValues.put(LOCATION_FIRST_WORD_NUMBER, firstWordNumber);
+    	contentValues.put(LOCATION_LENGTH_OF_SELECTION, lengthOfSelection);
+    	return mDb.insert(LOCATION_TABLE_TITLE, null, contentValues);
+    }
 }
