@@ -1,7 +1,9 @@
 package com.evilreader.android.library;
 
+import com.evilreader.android.MainActivity;
 import com.evilreader.android.R;
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -12,7 +14,7 @@ import android.widget.ImageView;
 /**
  * 
  * @author Dainius
- * TODO(dainius): think how to get images from evilbooks and put thm into grid
+ * TODO(dainius): think how to get images from evilbooks and put them into grid
  */
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
@@ -47,11 +49,12 @@ public class ImageAdapter extends BaseAdapter {
         imageView.setImageResource(mThumbIds[position]);
         
         // Just simple stub method assigned to view.
-        imageView.setOnClickListener(new OnClickListener() {
+/*        imageView.setOnClickListener(new OnClickListener() {
         	public void onClick(View v) {
-        		v.setVisibility(View.INVISIBLE);
+        		// here can be reading activity be invoked
+        		// v.setVisibility(View.INVISIBLE);
         	}
-        });
+        });*/
         return imageView;
     }
 
