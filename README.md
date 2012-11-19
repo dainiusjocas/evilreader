@@ -1,6 +1,7 @@
 evilreader
 ==========
 
+Dear reader, keep in mind that evilreader will support Android devices starting from Android 4.0.
 it will be the best eBook reader in the world
 
 Since project team prefer to use online tools for documentation, you may find these links quite valuable:
