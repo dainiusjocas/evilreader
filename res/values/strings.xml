@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">Evilreader</string>
@@ -6,5 +7,8 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_epub_content">EpubContentActivity</string>
     <string name="no_notes">There is no notes! Make one!</string>
+    <string name="library">Go to Library</string>
+    <string name="title_activity_library">EvilLibrary</string>
+    <string name="read_file">Read File</string>
 
 </resources>
