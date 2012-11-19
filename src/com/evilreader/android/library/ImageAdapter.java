@@ -3,11 +3,17 @@ package com.evilreader.android.library;
 import com.evilreader.android.R;
 import android.content.Context;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+/**
+ * 
+ * @author Dainius
+ * TODO(dainius): think how to get images from evilbooks and put thm into grid
+ */
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
 
@@ -38,8 +44,14 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             imageView = (ImageView) convertView;
         }
-
         imageView.setImageResource(mThumbIds[position]);
+        
+        // Just simple stub method assigned to view.
+        imageView.setOnClickListener(new OnClickListener() {
+        	public void onClick(View v) {
+        		v.setVisibility(View.INVISIBLE);
+        	}
+        });
         return imageView;
     }
 
