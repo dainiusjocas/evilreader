@@ -34,9 +34,9 @@ public class EvilLibraryScanner {
 		if (fileNamesInEvilDirectory == null) {
 			return null;
 		}
-		// (?i) is for case insensitive matching and [^._] is to get rid of 
+		// (?i) is for case insensitive matching and .[^_] is to get rid of 
 		// files that MACOSX Finder creates
-		String ePubRegEx = "[^._](?i).*.epub";  
+		String ePubRegEx = ".[^_](?i).*.epub";  
 		ArrayList<String> ePubFilesInEvilLibrary = new ArrayList<String>();
 		for (String fileName : fileNamesInEvilDirectory) {
 			if (fileName.matches(ePubRegEx)) {
