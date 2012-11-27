@@ -47,14 +47,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
         imageView.setImageResource(mThumbIds[position]);
-        
-        // Just simple stub method assigned to view.
-/*        imageView.setOnClickListener(new OnClickListener() {
-        	public void onClick(View v) {
-        		// here can be reading activity be invoked
-        		// v.setVisibility(View.INVISIBLE);
-        	}
-        });*/
+
         return imageView;
     }
 
