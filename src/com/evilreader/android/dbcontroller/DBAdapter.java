@@ -24,15 +24,15 @@ import android.util.Log;
  *
  */
 public class DBAdapter {
-	/*
-	 * Names and definitions for the EvilReader DB.
-	 */
+	/**************************************************************************
+	 * Names and definitions for the EvilReader DB
+	 *************************************************************************/
 	public static final String DATABASE_NAME = "evilreaderdb";
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 8;
 	
-	/*
-	 * Name definitions for Notes table. For only one table for now.
-	 */
+	/**************************************************************************
+	 * DEFINITIONS FOR NOTE TABLE
+	 *************************************************************************/
 	public static final String NOTE_TABLE_TITLE = "note";
 	public static final String NOTE_ROWID = "rowid";
 	public static final String NOTE_BODY  = "body";
@@ -51,9 +51,9 @@ public class DBAdapter {
 	        + NOTE_LOCATION_ID
 	        + " text not null);";
 	
-	/*
-	 * Possible definition for a LOCATION table.
-	 * 
+	/**************************************************************************
+	 * DEFINITION OF LOCATION TABLE
+	 **************************************************************************
 	 * LOCATION_FIRST_WORD_NUMBER caption the exact location of an object
 	 * related with an ebook. For example, I highlighted two words in a book, 
 	 * so, my highlight started at the 5th word of the specific paragraph and
@@ -88,6 +88,32 @@ public class DBAdapter {
 			+ LOCATION_LENGTH_OF_SELECTION
 			+ " text not null);";
 	
+	/**************************************************************************
+     * DEFINITION OF EVILBOOKS TABLE
+     *************************************************************************/
+    private static final String EVILBOOK_TABLE_TITLE = "evilbook";
+    private static final String EVILBOOK_ROWID = "evilbook_id";
+    private static final String EVILBOOK_TITLE = "title";
+    private static final String EVILBOOK_AUTHOR = "author";
+    private static final String EVILBOOK_FILENAME = "filename";
+    private static final String EVILBOOK_PATH = "path";
+    private static final String EVILBOOK_IS_PRESENT = "is_present";
+    private static final String DATABASE_CREATE_TABLE_EVILBOOK =
+	        "create table " 
+	        + EVILBOOK_TABLE_TITLE 
+	        + " ( "
+	        + EVILBOOK_ROWID
+	        + " integer primary key autoincrement, "
+	        + EVILBOOK_TITLE
+	        + " text, "
+	        + EVILBOOK_AUTHOR 
+	        + " text, "
+	        + EVILBOOK_IS_PRESENT 
+	        + " text, "
+	        + EVILBOOK_FILENAME
+	        + " text,"
+	        + EVILBOOK_PATH
+	        + " text);";
 	
 	//TODO(dainius): describe all the tables;
 	//TODO(dainius): add code for all the table handlers. 
@@ -96,16 +122,17 @@ public class DBAdapter {
      * Database creation sql statement. For now its just one table NOTES!
      * TODO(dainius): rewrite for multitable case;
      */
-    private static final String DATABASE_CREATE =
-        "create table " 
-        + NOTE_TABLE_TITLE 
-        + " ( "
-        + NOTE_ROWID
-        + " integer primary key autoincrement, "
-        + NOTE_BODY
-        + " text not null, "
-        + NOTE_BOOK_ID 
-        + " text not null);";
+    private static final String DATABASE_CREATE = 
+    		DATABASE_CREATE_TABLE_EVILBOOK;
+//        "create table " 
+//        + NOTE_TABLE_TITLE 
+//        + " ( "
+//        + NOTE_ROWID
+//        + " integer primary key autoincrement, "
+//        + NOTE_BODY
+//        + " text not null, "
+//        + NOTE_BOOK_ID 
+//        + " text not null);";
     
     
 	
@@ -170,6 +197,8 @@ public class DBAdapter {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
             db.execSQL("DROP TABLE IF EXISTS " + NOTE_TABLE_TITLE);
+            db.execSQL("DROP TABLE IF EXISTS " + EVILBOOK_TABLE_TITLE);
+            db.execSQL("DROP TABLE IF EXISTS " + LOCATION_TABLE_TITLE);
             onCreate(db);
         }
     }
@@ -256,7 +285,7 @@ public class DBAdapter {
      *************************************************************************/
     
     /**
-     * §
+     * 
      * @param book_id
      * @param chapterNumber
      * @param paragraphNumber
@@ -274,5 +303,64 @@ public class DBAdapter {
     	contentValues.put(LOCATION_FIRST_WORD_NUMBER, firstWordNumber);
     	contentValues.put(LOCATION_LENGTH_OF_SELECTION, lengthOfSelection);
     	return mDb.insert(LOCATION_TABLE_TITLE, null, contentValues);
+    }
+    
+    public Cursor getLocation(String location_id) throws SQLException {
+    	Cursor mCursor = mDb.query(LOCATION_TABLE_TITLE, 
+    			new String[] {LOCATION_ROWID,
+    			LOCATION_CHAPTER_NUMBER,
+    			LOCATION_PARAGRAPH_NUMBER},
+    			NOTE_ROWID + "=" + location_id, null, null, null, null);
+    	if (mCursor != null) {
+    		mCursor.moveToFirst();
+    	}
+    	return mCursor;
+    }
+    
+    
+    
+    /**************************************************************************
+     * HANDLERS FOR EVILBOOK TABLE
+     *************************************************************************/
+    
+    /**
+     * Stores EvilBook entry in database. 
+     * TODO(dainius) For now I care only about file names
+     * @param title
+     * @param author
+     * @param filename
+     * @param path
+     * @return rowid if success or -1 if failed to store
+     */
+    public long storeEvilBook(String title, String author, String filename,
+    		String path) {
+    	long rowid;
+    	ContentValues values = new ContentValues();
+    	values.put(EVILBOOK_TITLE, title);
+    	values.put(EVILBOOK_AUTHOR, author);
+    	values.put(EVILBOOK_FILENAME, filename);
+    	values.put(EVILBOOK_PATH, path);
+    	rowid = mDb.insert(EVILBOOK_TABLE_TITLE, null, values);
+    	return rowid;
+    }
+    
+    /**
+     * Get all the column files filenames of ebooks
+     * 
+     * TODO(dainius): return only books that are present
+     * @return cursor to the results
+     */
+    public Cursor getFilenamesEvilBooks() {
+    	Cursor cursorToFilenamesOfEvilBooks;
+    	String[] columns = {EVILBOOK_FILENAME};
+    	 cursorToFilenamesOfEvilBooks = this.mDb.query(
+    			EVILBOOK_TABLE_TITLE,
+    			columns, 
+    			null, 
+    			null,
+    			null, 
+    			null, 
+    			null);
+    	return cursorToFilenamesOfEvilBooks;
     }
 }
