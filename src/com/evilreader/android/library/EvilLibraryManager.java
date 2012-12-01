@@ -1,6 +1,7 @@
 package com.evilreader.android.library;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import com.evilreader.android.dbcontroller.DBAdapter;
@@ -53,11 +54,11 @@ public class EvilLibraryManager {
 		this._EvilLibraryScanner = 
 				new EvilLibraryScanner(this._EvilLibraryDirectory);
 	}
-	
+		
 	public ArrayList<String> getListOfEvilBooksFromDB() {
 		ArrayList<String> listOfEvilBooks = new ArrayList<String>();
 		this._DBAdapter.open();
-		Cursor cursor = this._DBAdapter.getFilenamesEvilBooks();
+		Cursor cursor = this._DBAdapter.getTitlesOfEvilBooks();
 		// Maybe there should be a check if there are elements
 		// If not then a message should be displayed.
 		if (!cursor.moveToFirst()) {
@@ -157,21 +158,30 @@ public class EvilLibraryManager {
 	/*
 	 * Strores evil books in the database. 
 	 * 
-	 * @param mEvilBooks list of filenames of epubs. 
-	 * TODO(dainius): extract info about books from epub files
+	 * @param mEvilBooks list of filenames (not absolute path) of epubs. 
 	 */
 	public void storeEvilBooks(ArrayList<String> mEvilBooks) {
 		String title;
-		String author;
+		String authors;
+		String year;
 		String filename;
 		String path;
 		for (String evilBook : mEvilBooks) {
-			title = "title";     // mock
-			author = "author";   // mock
-			filename = evilBook; // more or less the desired info
-			path = "path";       // mock
+			
+			String anAbsolutePath = 
+					this._EvilLibraryDirectory.getAbsolutePath() 
+					+ "/" 
+					+ evilBook;
+			
+			EvilBook aEvilBook = new EvilBook(anAbsolutePath);
+			aEvilBook.getTitle();
+			authors = aEvilBook.getAuthors();
+			title = aEvilBook.getTitle();
+			year = aEvilBook.getYear();
+			filename = evilBook;
+			path = anAbsolutePath;
 			this._DBAdapter.open();
-			this._DBAdapter.storeEvilBook(title, author, filename, path);
+			this._DBAdapter.storeEvilBook(title, authors, year, filename, path);
 			this._DBAdapter.close();
 		}
 	}
@@ -181,6 +191,7 @@ public class EvilLibraryManager {
 		ArrayList<String> evilFiles = getListOfFileNamesOfePubFiles();
 		storeEvilBooks(evilFiles);
 	}
+	
 	// getCoverImages
 	// removeBook()
 	// get list of ebook covers
