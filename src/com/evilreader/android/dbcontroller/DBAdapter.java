@@ -28,7 +28,7 @@ public class DBAdapter {
 	 * Names and definitions for the EvilReader DB
 	 *************************************************************************/
 	public static final String DATABASE_NAME = "evilreaderdb";
-	public static final int DATABASE_VERSION = 8;
+	public static final int DATABASE_VERSION = 13;
 	
 	/**************************************************************************
 	 * DEFINITIONS FOR NOTE TABLE
@@ -95,6 +95,8 @@ public class DBAdapter {
     private static final String EVILBOOK_ROWID = "evilbook_id";
     private static final String EVILBOOK_TITLE = "title";
     private static final String EVILBOOK_AUTHOR = "author";
+    private static final String EVILBOOK_YEAR = "year";
+    // Unique, but it should renew items.
     private static final String EVILBOOK_FILENAME = "filename";
     private static final String EVILBOOK_PATH = "path";
     private static final String EVILBOOK_IS_PRESENT = "is_present";
@@ -108,12 +110,15 @@ public class DBAdapter {
 	        + " text, "
 	        + EVILBOOK_AUTHOR 
 	        + " text, "
+	        + EVILBOOK_YEAR
+	        + " text, "
 	        + EVILBOOK_IS_PRESENT 
 	        + " text, "
 	        + EVILBOOK_FILENAME
-	        + " text,"
+	        + " text unique,"
 	        + EVILBOOK_PATH
-	        + " text);";
+	        + " text "
+	        + ");";
 	
 	//TODO(dainius): describe all the tables;
 	//TODO(dainius): add code for all the table handlers. 
@@ -332,15 +337,17 @@ public class DBAdapter {
      * @param path
      * @return rowid if success or -1 if failed to store
      */
-    public long storeEvilBook(String title, String author, String filename,
-    		String path) {
+    public long storeEvilBook(String title, String author, String year,
+    		String filename, String path) {
     	long rowid;
     	ContentValues values = new ContentValues();
     	values.put(EVILBOOK_TITLE, title);
     	values.put(EVILBOOK_AUTHOR, author);
+    	values.put(EVILBOOK_YEAR, year);
     	values.put(EVILBOOK_FILENAME, filename);
     	values.put(EVILBOOK_PATH, path);
-    	rowid = mDb.insert(EVILBOOK_TABLE_TITLE, null, values);
+    	rowid = mDb.insertWithOnConflict(EVILBOOK_TABLE_TITLE, null, values, 4);
+    	//rowid = mDb.insert(EVILBOOK_TABLE_TITLE, null, values);
     	return rowid;
     }
     
@@ -353,7 +360,7 @@ public class DBAdapter {
     public Cursor getFilenamesEvilBooks() {
     	Cursor cursorToFilenamesOfEvilBooks;
     	String[] columns = {EVILBOOK_FILENAME};
-    	 cursorToFilenamesOfEvilBooks = this.mDb.query(
+    	cursorToFilenamesOfEvilBooks = this.mDb.query(
     			EVILBOOK_TABLE_TITLE,
     			columns, 
     			null, 
@@ -362,5 +369,24 @@ public class DBAdapter {
     			null, 
     			null);
     	return cursorToFilenamesOfEvilBooks;
+    }
+    
+    /**
+     * Gets cursor to all titles of evil books in the evilbook table
+     * 
+     * @return cursor
+     */
+    public Cursor getTitlesOfEvilBooks() {
+    	Cursor cursorToTitlesOfEvilBooks;
+    	String[] columns = {EVILBOOK_TITLE};
+    	cursorToTitlesOfEvilBooks = this.mDb.query(
+    			EVILBOOK_TABLE_TITLE,
+    			columns, 
+    			null, 
+    			null,
+    			null, 
+    			null, 
+    			null);
+    	return cursorToTitlesOfEvilBooks;
     }
 }
