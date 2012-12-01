@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Debug;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +33,8 @@ public class LibraryActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// TODO(dainius) delete trace file
+		Debug.startMethodTracing("traceFile");
 		this._SavedInstanceState = savedInstanceState;
 		// set or create base directory for ebooks
 		this._EvilLibraryManager = EvilLibraryManager.getInstance(this);
