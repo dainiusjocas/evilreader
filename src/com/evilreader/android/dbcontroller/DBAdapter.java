@@ -19,16 +19,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
- * This class is dedicated to control EvilReader communication with database. 
+ * This class is dedicated to control EvilReader communication with database.
+ *  
  * @author Dainius Jocas
  *
  */
-public class DBAdapter {
+public class DBAdapter implements EvilBookTable {
 	/**************************************************************************
 	 * Names and definitions for the EvilReader DB
 	 *************************************************************************/
 	public static final String DATABASE_NAME = "evilreaderdb";
-	public static final int DATABASE_VERSION = 13;
+	public static final int DATABASE_VERSION = 18;
 	
 	/**************************************************************************
 	 * DEFINITIONS FOR NOTE TABLE
@@ -50,6 +51,7 @@ public class DBAdapter {
 	        + " text not null, "
 	        + NOTE_LOCATION_ID
 	        + " text not null);";
+	/*************************************************************************/
 	
 	/**************************************************************************
 	 * DEFINITION OF LOCATION TABLE
@@ -89,23 +91,31 @@ public class DBAdapter {
 			+ " text not null);";
 	
 	/**************************************************************************
-     * DEFINITION OF EVILBOOKS TABLE
+	 * EVILBOOK table name
+	 *************************************************************************/
+	private final String EVILBOOK_TABLE_TITLE = "evilbook";
+	/**************************************************************************
+     * EVILBOOK column names
      *************************************************************************/
-    private static final String EVILBOOK_TABLE_TITLE = "evilbook";
-    private static final String EVILBOOK_ROWID = "evilbook_id";
-    private static final String EVILBOOK_TITLE = "title";
-    private static final String EVILBOOK_AUTHOR = "author";
-    private static final String EVILBOOK_YEAR = "year";
-    // Unique, but it should renew items.
-    private static final String EVILBOOK_FILENAME = "filename";
-    private static final String EVILBOOK_PATH = "path";
-    private static final String EVILBOOK_IS_PRESENT = "is_present";
-    private static final String DATABASE_CREATE_TABLE_EVILBOOK =
+	private final String EVILBOOK_ROWID = "evilbook_rowid";
+	private final String EVILBOOK_ID = "evilbook_id";
+	private final String EVILBOOK_TITLE = "title";
+	private final String EVILBOOK_AUTHOR = "author";
+	private final String EVILBOOK_YEAR = "year";
+	private final String EVILBOOK_FILENAME = "filename";
+	private final String EVILBOOK_ABSOLUTE_PATH = "absolute_path";
+	private final String EVILBOOK_IS_PRESENT = "is_present";
+    /**************************************************************************
+     * EVILBOOK table creation SQL statement
+     *************************************************************************/
+    private final String CREATE_TABLE_EVILBOOK =
 	        "create table " 
 	        + EVILBOOK_TABLE_TITLE 
 	        + " ( "
 	        + EVILBOOK_ROWID
 	        + " integer primary key autoincrement, "
+	        + EVILBOOK_ID
+	        + " text unique, "
 	        + EVILBOOK_TITLE
 	        + " text, "
 	        + EVILBOOK_AUTHOR 
@@ -115,33 +125,22 @@ public class DBAdapter {
 	        + EVILBOOK_IS_PRESENT 
 	        + " text, "
 	        + EVILBOOK_FILENAME
-	        + " text unique,"
-	        + EVILBOOK_PATH
+	        + " text, "
+	        + EVILBOOK_ABSOLUTE_PATH
 	        + " text "
 	        + ");";
+    /*************************************************************************/
 	
 	//TODO(dainius): describe all the tables;
 	//TODO(dainius): add code for all the table handlers. 
 	
 	/**
-     * Database creation sql statement. For now its just one table NOTES!
+     * Database creation sql statement. For now its just one table EVILBOOK!
      * TODO(dainius): rewrite for multitable case;
      */
-    private static final String DATABASE_CREATE = 
-    		DATABASE_CREATE_TABLE_EVILBOOK;
-//        "create table " 
-//        + NOTE_TABLE_TITLE 
-//        + " ( "
-//        + NOTE_ROWID
-//        + " integer primary key autoincrement, "
-//        + NOTE_BODY
-//        + " text not null, "
-//        + NOTE_BOOK_ID 
-//        + " text not null);";
-    
-    
+    private final String DATABASE_CREATE = CREATE_TABLE_EVILBOOK;    
 	
-	private static final String TAG = "DBAdapter";
+	private final String TAG = "DBAdapter";
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
 	
@@ -185,7 +184,7 @@ public class DBAdapter {
 	 * @author dainius
 	 *
 	 */
-    private static class DatabaseHelper extends SQLiteOpenHelper {
+    private class DatabaseHelper extends SQLiteOpenHelper {
 
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -325,46 +324,68 @@ public class DBAdapter {
     
     
     /**************************************************************************
-     * HANDLERS FOR EVILBOOK TABLE
+     * HANDLERS OF EVILBOOK TABLE
      *************************************************************************/
-    
     /**
-     * Stores EvilBook entry in database. 
-     * TODO(dainius) For now I care only about file names
+     * Stores EvilBook entry in database.
+     * 
      * @param title
-     * @param author
-     * @param filename
-     * @param path
+     * @param pAuthor
+     * @param pFilename
+     * @param pAbsolutePath
      * @return rowid if success or -1 if failed to store
      */
-    public long storeEvilBook(String title, String author, String year,
-    		String filename, String path) {
+    public long storeEvilBook(String pTitle, String pAuthor, String pYear,
+    		String pFilename, String pAbsolutePath) {
     	long rowid;
     	ContentValues values = new ContentValues();
-    	values.put(EVILBOOK_TITLE, title);
-    	values.put(EVILBOOK_AUTHOR, author);
-    	values.put(EVILBOOK_YEAR, year);
-    	values.put(EVILBOOK_FILENAME, filename);
-    	values.put(EVILBOOK_PATH, path);
+    	String anEvilBookId = 
+    			constructEvilBookId(pTitle, pAuthor, pYear, pAbsolutePath);
+    	values.put(EVILBOOK_ID, anEvilBookId);
+    	values.put(EVILBOOK_TITLE, pTitle);
+    	values.put(EVILBOOK_AUTHOR, pAuthor);
+    	values.put(EVILBOOK_YEAR, pYear);
+    	values.put(EVILBOOK_IS_PRESENT, "true");
+    	values.put(EVILBOOK_FILENAME, pFilename);
+    	values.put(EVILBOOK_ABSOLUTE_PATH, pAbsolutePath);
     	rowid = mDb.insertWithOnConflict(EVILBOOK_TABLE_TITLE, null, values, 4);
-    	//rowid = mDb.insert(EVILBOOK_TABLE_TITLE, null, values);
     	return rowid;
+    }
+    
+    /**
+     * Fetches a cursor to all EvilBooks
+     * 
+     * @return Cursor
+     */
+    public Cursor fetchAllEvilBooks() {
+    	Cursor aCursorToAllEvilBooks;
+    	String[] columns = {EVILBOOK_ABSOLUTE_PATH, EVILBOOK_ROWID};
+    	String[] aSelectionArgs = {"true"};
+    	aCursorToAllEvilBooks = this.mDb.query(
+    			EVILBOOK_TABLE_TITLE,
+    			columns, 
+    			EVILBOOK_IS_PRESENT + " =  ? ", 
+    			aSelectionArgs,
+    			null, 
+    			null, 
+    			null);
+    	return aCursorToAllEvilBooks;
     }
     
     /**
      * Get all the column files filenames of ebooks
      * 
-     * TODO(dainius): return only books that are present
      * @return cursor to the results
      */
-    public Cursor getFilenamesEvilBooks() {
+    public Cursor getFilenamesOfEvilBooks() {
     	Cursor cursorToFilenamesOfEvilBooks;
     	String[] columns = {EVILBOOK_FILENAME};
+    	String[] aSelectionArgs = {"true"};
     	cursorToFilenamesOfEvilBooks = this.mDb.query(
     			EVILBOOK_TABLE_TITLE,
     			columns, 
-    			null, 
-    			null,
+    			EVILBOOK_IS_PRESENT + " =  ? ", 
+    			aSelectionArgs,
     			null, 
     			null, 
     			null);
@@ -379,14 +400,57 @@ public class DBAdapter {
     public Cursor getTitlesOfEvilBooks() {
     	Cursor cursorToTitlesOfEvilBooks;
     	String[] columns = {EVILBOOK_TITLE};
+    	String[] aSelectionArgs = {"true"};
     	cursorToTitlesOfEvilBooks = this.mDb.query(
     			EVILBOOK_TABLE_TITLE,
     			columns, 
-    			null, 
-    			null,
+    			EVILBOOK_IS_PRESENT + " =  ? ", 
+    			aSelectionArgs,
     			null, 
     			null, 
     			null);
     	return cursorToTitlesOfEvilBooks;
     }
+    
+    /**
+     * Constructs an Id for an EvilBook in that way: takes first word of title,
+     * concatenates it with publication year, first word of author and absolute
+     * path. Similar to Google Scholar BibTeX format.
+     * 
+     * @return String anEvilBookId
+     */
+    public String constructEvilBookId(String pTitle, String pAuthor,
+    		String pYear, String pAbsolutePath) {
+    	String anEvilBookId = "";
+  
+    	String aRegexForTitle = " ";
+    	String aTitle = pTitle.split(aRegexForTitle)[0];
+    	
+    	String aRegexForAuthor = ",";
+    	String anAuthor = pAuthor.split(aRegexForAuthor)[0];
+    	
+    	anEvilBookId = aTitle + pYear + anAuthor + pAbsolutePath;
+    	return anEvilBookId;
+    }
+    
+    /**
+     * Set column EVILBOOK_IS_PRESENT value specified row id.
+     * 
+     * @param long pEvilBookRowId
+     * @param String pTrueOrFalse
+     * @return boolean if true - OK, false - strange because it should be true.
+     */
+    public boolean markEvilBookStatus(long pEvilBookRowId, 
+    		String pTrueOrFalse) {
+    	boolean isUpdated = false;
+    	ContentValues values = new ContentValues();
+    	values.put(EVILBOOK_IS_PRESENT, pTrueOrFalse);
+    	isUpdated = this.mDb.update(
+    			EVILBOOK_TABLE_TITLE, 
+    			values, 
+    			EVILBOOK_ROWID + "=" + pEvilBookRowId, 
+    			null) > 0;
+    	return isUpdated;
+    }
+    /*************************************************************************/
 }
