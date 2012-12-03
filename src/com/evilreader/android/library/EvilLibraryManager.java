@@ -175,7 +175,7 @@ public class EvilLibraryManager {
 			
 			EvilBook aEvilBook = new EvilBook(anAbsolutePath);
 			aEvilBook.getTitle();
-			authors = aEvilBook.getAuthors();
+			authors = aEvilBook.getAuthors().trim();
 			title = aEvilBook.getTitle();
 			year = aEvilBook.getYear();
 			filename = evilBook;
@@ -190,6 +190,27 @@ public class EvilLibraryManager {
 	public void refreshListOfEvilBooks() {
 		ArrayList<String> evilFiles = getListOfFileNamesOfePubFiles();
 		storeEvilBooks(evilFiles);
+		markEvilBooksThatAreNotPresent();
+	}
+	
+	/**
+	 * Marks evil books that file path is not valid.
+	 */
+	public void markEvilBooksThatAreNotPresent() {
+		this._DBAdapter.open();
+		// two columns - [0] - absolute path, [1] - id
+		Cursor aCursor = this._DBAdapter.fetchAllEvilBooks();
+		if (!aCursor.moveToFirst()) {
+			Log.e("EVILREADER", "NO EVIL BOOKS IN THE LIBRARY");
+		}
+		do {
+			File aFile = new File(aCursor.getString(0));
+			if (!aFile.exists()) {
+				int aRowId = Integer.valueOf(aCursor.getString(1));
+				this._DBAdapter.markEvilBookStatus(aRowId, "false");
+			}
+		} while(aCursor.moveToNext());
+		this._DBAdapter.close();
 	}
 	
 	// getCoverImages
