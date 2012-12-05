@@ -7,6 +7,8 @@
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="17" />
+    
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -29,7 +31,6 @@
         <activity
             android:name="com.evilreader.android.MainActivity"
             android:label="@string/title_activity_main" >
-            
         </activity>
         <activity
             android:name="com.evilreader.android.epubcontentcontrol.EpubContentActivity"
