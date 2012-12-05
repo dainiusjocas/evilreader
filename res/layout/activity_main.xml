@@ -7,34 +7,30 @@
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:maxLines="300"
         android:scrollbars="vertical"
         android:text="@string/hello_world"
-        tools:context=".MainActivity"
-        android:textIsSelectable="true" />
+        android:textIsSelectable="true"
+        tools:context=".MainActivity" />
+
+    <Button
+        android:id="@+id/go_to_library"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="42dp"
+        android:text="@string/library" />
 
     <EditText
         android:id="@+id/editText1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/textView1"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_marginBottom="104dp"
-        android:ems="10"
-        android:inputType="textMultiLine">
-
-        <requestFocus />
-    </EditText>
-
-		<!-- <WebView android:id="@+id/testEpubWebView"
-		android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        tools:context=".MainActivity"/> -->
+        android:layout_centerHorizontal="true"
+        android:ems="10"
+        android:inputType="textMultiLine" />
 
 </RelativeLayout>
