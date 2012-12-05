@@ -4,7 +4,9 @@ import com.evilreader.android.dbcontroller.DBAdapter;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	/* Database integration */
@@ -14,9 +16,11 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.mDbAdapter = new DBAdapter(this);
-        this.mDbAdapter.open();
-        this.mDbAdapter.close();
+        String value = getIntent().getExtras().getString("absolute_path");
+        Log.e("EVILREADER", value);
+        TextView aTextView = (TextView) findViewById(R.id.textView1);
+        Log.e("EVILREADER", "" + aTextView.getText());
+        aTextView.setText(value);
     }
 
     @Override
