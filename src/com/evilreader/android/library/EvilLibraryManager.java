@@ -1,8 +1,8 @@
 package com.evilreader.android.library;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.evilreader.android.dbcontroller.DBAdapter;
 
@@ -23,30 +23,27 @@ public class EvilLibraryManager {
 	Context _Context;
 	// Database controller
 	private DBAdapter _DBAdapter;
-	// Part of singleton design pattern
-	private static EvilLibraryManager _Instance = null;
-	
 	// Scanner for Evil Library
 	// TODO(dainius) I think this is only necessary when evilreader is actually 
 	// going to the filesystem. So not in constructor.
 	private EvilLibraryScanner _EvilLibraryScanner;
-	
-	// List of books
-	private ArrayList<String> _ListOfEvilBooks;
-	
-	// Path to the directory
+	// List of evil books
+	private ArrayList<String> _ListOfEvilBooks = new ArrayList<String>();;
+	// Absolute path to the directory
 	private File _EvilLibraryDirectory;
-	
 	// Constant library folder name
-	private static final String EVIL_LIBRARY_DIRECTORY = "evilbooks/";
+	private final String EVIL_LIBRARY_DIRECTORY = "evilbooks/";
 	
 	
 	
-	/* not public constructor */
-	protected EvilLibraryManager(Context mContext) {
+	/**
+	 * Constructor
+	 *  
+	 * @param mContext
+	 */
+	public EvilLibraryManager(Context mContext) {
 		this._Context = mContext;
 		this._DBAdapter = new DBAdapter(this._Context);
-		this._ListOfEvilBooks = new ArrayList<String>();
 		this._ListOfEvilBooks = getListOfEvilBooksFromDB();
 		// this line makes me susipicious
 		this._EvilLibraryDirectory = 
@@ -79,18 +76,6 @@ public class EvilLibraryManager {
 	}
 	
 	/**
-	 * Gets instance of EvilLibraryManager.
-	 * 
-	 * @return instance of EvilLibraryManager
-	 */
-	public static EvilLibraryManager getInstance(Context mContext) {
-		if (EvilLibraryManager._Instance == null) {
-			EvilLibraryManager._Instance = new EvilLibraryManager(mContext);
-		}
-		return EvilLibraryManager._Instance;
-	}
-	
-	/**
 	 * Checks if directory in the external storage (e.g. sdcard) for eBooks
 	 * exists, and if not creates it. If external storage is not writable and
 	 * evil directory does not exist, then null is returned. 
@@ -107,7 +92,7 @@ public class EvilLibraryManager {
 			// so we can check if exists directory we need and if not create
 			directoryForEvilLibrary = 
 					new File(Environment.getExternalStorageDirectory(), 
-							EvilLibraryManager.EVIL_LIBRARY_DIRECTORY);
+							this.EVIL_LIBRARY_DIRECTORY);
 			if (!isEvilLibraryDirectoryPresent()) {
 				directoryForEvilLibrary.mkdir();
 			}
@@ -120,7 +105,7 @@ public class EvilLibraryManager {
 			}
 			directoryForEvilLibrary = 
 					new File(Environment.getExternalStorageDirectory(), 
-							EvilLibraryManager.EVIL_LIBRARY_DIRECTORY);
+							this.EVIL_LIBRARY_DIRECTORY);
 		} else {
 			// not writable and not readable 
 			return null;
@@ -133,7 +118,7 @@ public class EvilLibraryManager {
 		File sdCardMountPoint = Environment.getExternalStorageDirectory();
 		File directoryForEvilLibrary = 
 				new File(sdCardMountPoint, 
-						EvilLibraryManager.EVIL_LIBRARY_DIRECTORY);
+						this.EVIL_LIBRARY_DIRECTORY);
 		
 		if (!directoryForEvilLibrary.exists()) {
 			return false; // evil directory does not exist
@@ -211,6 +196,25 @@ public class EvilLibraryManager {
 			}
 		} while(aCursor.moveToNext());
 		this._DBAdapter.close();
+	}
+	
+	/**
+	 * Constructs hash map for EvilBooks <Title, AbsolutePath>
+	 * 
+	 * @return aHashMap
+	 */
+	public HashMap<String, String> getTitleAndPathHashMap() {
+		this._DBAdapter.open();
+		HashMap<String, String> aHashMap = new HashMap<String, String>();
+		Cursor aCursor = this._DBAdapter.getTitlesAndPathsOfEvilBooks();
+		if (!aCursor.moveToFirst()) {
+			Log.e("EVILREADER", "NO EVIL BOOKS IN THE LIBRARY");
+		}
+		do {
+			aHashMap.put(aCursor.getString(0), aCursor.getString(1));
+		} while(aCursor.moveToNext());
+		this._DBAdapter.close();
+		return aHashMap;
 	}
 	
 	// getCoverImages
