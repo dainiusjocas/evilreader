@@ -93,22 +93,22 @@ public class DBAdapter implements EvilBookTable {
 	/**************************************************************************
 	 * EVILBOOK table name
 	 *************************************************************************/
-	private final String EVILBOOK_TABLE_TITLE = "evilbook";
+	private static final String EVILBOOK_TABLE_TITLE = "evilbook";
 	/**************************************************************************
      * EVILBOOK column names
      *************************************************************************/
-	private final String EVILBOOK_ROWID = "evilbook_rowid";
-	private final String EVILBOOK_ID = "evilbook_id";
-	private final String EVILBOOK_TITLE = "title";
-	private final String EVILBOOK_AUTHOR = "author";
-	private final String EVILBOOK_YEAR = "year";
-	private final String EVILBOOK_FILENAME = "filename";
-	private final String EVILBOOK_ABSOLUTE_PATH = "absolute_path";
-	private final String EVILBOOK_IS_PRESENT = "is_present";
+	private static final String EVILBOOK_ROWID = "evilbook_rowid";
+	private static final String EVILBOOK_ID = "evilbook_id";
+	private static final String EVILBOOK_TITLE = "title";
+	private static final String EVILBOOK_AUTHOR = "author";
+	private static final String EVILBOOK_YEAR = "year";
+	private static final String EVILBOOK_FILENAME = "filename";
+	private static final String EVILBOOK_ABSOLUTE_PATH = "absolute_path";
+	private static final String EVILBOOK_IS_PRESENT = "is_present";
     /**************************************************************************
      * EVILBOOK table creation SQL statement
      *************************************************************************/
-    private final String CREATE_TABLE_EVILBOOK =
+    private static final String CREATE_TABLE_EVILBOOK =
 	        "create table " 
 	        + EVILBOOK_TABLE_TITLE 
 	        + " ( "
@@ -138,9 +138,9 @@ public class DBAdapter implements EvilBookTable {
      * Database creation sql statement. For now its just one table EVILBOOK!
      * TODO(dainius): rewrite for multitable case;
      */
-    private final String DATABASE_CREATE = CREATE_TABLE_EVILBOOK;    
+    private static final String DATABASE_CREATE = CREATE_TABLE_EVILBOOK;    
 	
-	private final String TAG = "DBAdapter";
+	private final static String TAG = "DBAdapter";
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
 	
@@ -184,7 +184,7 @@ public class DBAdapter implements EvilBookTable {
 	 * @author dainius
 	 *
 	 */
-    private class DatabaseHelper extends SQLiteOpenHelper {
+    private static class DatabaseHelper extends SQLiteOpenHelper {
 
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -327,7 +327,8 @@ public class DBAdapter implements EvilBookTable {
      * HANDLERS OF EVILBOOK TABLE
      *************************************************************************/
     /**
-     * Stores EvilBook entry in database.
+     * Stores EvilBook entry in database. Is the book exists then replace the 
+     * old row in the table (DANGER).
      * 
      * @param title
      * @param pAuthor
@@ -348,7 +349,8 @@ public class DBAdapter implements EvilBookTable {
     	values.put(EVILBOOK_IS_PRESENT, "true");
     	values.put(EVILBOOK_FILENAME, pFilename);
     	values.put(EVILBOOK_ABSOLUTE_PATH, pAbsolutePath);
-    	rowid = mDb.insertWithOnConflict(EVILBOOK_TABLE_TITLE, null, values, 4);
+    	rowid = mDb.insertWithOnConflict(EVILBOOK_TABLE_TITLE, null, values,
+    			SQLiteDatabase.CONFLICT_REPLACE);
     	return rowid;
     }
     
@@ -400,16 +402,31 @@ public class DBAdapter implements EvilBookTable {
     public Cursor getTitlesOfEvilBooks() {
     	Cursor cursorToTitlesOfEvilBooks;
     	String[] columns = {EVILBOOK_TITLE};
-    	String[] aSelectionArgs = {"true"};
+    	String[] selectionArgs = {"true"};
     	cursorToTitlesOfEvilBooks = this.mDb.query(
     			EVILBOOK_TABLE_TITLE,
     			columns, 
     			EVILBOOK_IS_PRESENT + " =  ? ", 
-    			aSelectionArgs,
+    			selectionArgs,
     			null, 
     			null, 
     			null);
     	return cursorToTitlesOfEvilBooks;
+    }
+    
+    public Cursor getTitlesAndPathsOfEvilBooks() {
+    	Cursor aCursorToTitlesAndPaths;
+    	String[] columns = {EVILBOOK_TITLE, EVILBOOK_ABSOLUTE_PATH};
+    	String[] selectionArgs = {"true"};
+    	aCursorToTitlesAndPaths = this.mDb.query(
+    			EVILBOOK_TABLE_TITLE, 
+    			columns, 
+    			EVILBOOK_IS_PRESENT + " = ?", 
+    			selectionArgs, 
+    			null, 
+    			null, 
+    			null);
+    	return aCursorToTitlesAndPaths;
     }
     
     /**
