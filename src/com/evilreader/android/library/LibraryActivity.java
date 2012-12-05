@@ -1,9 +1,12 @@
 package com.evilreader.android.library;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Debug;
@@ -15,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.evilreader.android.R;
@@ -25,36 +29,54 @@ public class LibraryActivity extends Activity {
 	private DBAdapter mDbAdapter;
 	
 	/* Evil Library Manager */
-	private EvilLibraryManager _EvilLibraryManager;
+	private static EvilLibraryManager _EvilLibraryManager;
 	
-	private static Context context;
+	private static Context _Context;
 	private Bundle _SavedInstanceState;
+	private static TextAdapter _TextAdapter;
+	private static HashMap<String, String> _TitlesAndAbsolutePaths;
+	private static ArrayList<String> _Titles = new ArrayList<String>();
 	
-	@Override
+	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// TODO(dainius) delete trace file
-		Debug.startMethodTracing("traceFile");
+		LibraryActivity.setContext(getApplicationContext());
 		this._SavedInstanceState = savedInstanceState;
-		// set or create base directory for ebooks
-		this._EvilLibraryManager = EvilLibraryManager.getInstance(this);
-		ArrayList<String> fileNames = new ArrayList<String>();
-		fileNames = this._EvilLibraryManager.getListOfEvilBooksFromDB();
-		// TODO(dainius): code which handles the situation when no books are available
-		ArrayList<String> test = new ArrayList<String>();
-		test.addAll(fileNames);
-		LibraryActivity.context = getApplicationContext();
+		LibraryActivity.setEvilLibraryManager(new EvilLibraryManager(this));
+		
+		HashMap<String, String> aHashMapOfTitlesAndPaths = 
+				LibraryActivity._EvilLibraryManager.getTitleAndPathHashMap();
+		LibraryActivity.setTitlesAndAbsolutePaths(aHashMapOfTitlesAndPaths);
+		
+		LibraryActivity.setTitles(LibraryActivity.getTitlesFromHashMapOfTitlesAndPaths());
+		
 		setContentView(R.layout.activity_library);
+		
 		// Impossible to set fullscreen in layout xml file, so it is done here
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		GridView gridview = (GridView) findViewById(R.id.gridview);
-		gridview.setAdapter(new TextAdapter(this, test));
+		TextAdapter aTextAdapter = 
+				new TextAdapter(LibraryActivity.getAppContext(),
+						LibraryActivity.getTitles());
+		
+		LibraryActivity.setTextAdapter(aTextAdapter);
+		gridview.setAdapter(LibraryActivity.getTextAdapter());
 		
 		gridview.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	            Toast.makeText(LibraryActivity.this, "" + position, Toast.LENGTH_SHORT).show();
+	        	// here is the place to react when item is pressed
+	        	String aTitle = 
+	        			LibraryActivity.getTextAdapter().getTitle(position);
+	        	String aPath = LibraryActivity._TitlesAndAbsolutePaths.get(aTitle);
+	        	Log.e("EVILREADER", aPath);
+	        	Bundle extras = new Bundle();
+	        	extras.putString("absolute_path", aPath);
+	        	Intent aIntent = new Intent(LibraryActivity.this, com.evilreader.android.MainActivity.class);
+	        	aIntent.putExtras(extras);
+	        	startActivity(aIntent);
+	        	//Toast.makeText(LibraryActivity.this, "" + position, Toast.LENGTH_SHORT).show();
 	        }
 	    });
 		
@@ -69,13 +91,44 @@ public class LibraryActivity extends Activity {
 	    });*/
 
 	}
+	private static void setTitles(Set<String> pTitles) {
+		LibraryActivity._Titles.addAll(pTitles);
+	}
+	private static ArrayList<String> getTitles() {
+		return LibraryActivity._Titles;
+	}
+	private static Set<String> getTitlesFromHashMapOfTitlesAndPaths() {
+		Set<String> titles = LibraryActivity._TitlesAndAbsolutePaths.keySet();
+		return titles;
+	}
+	private static void setContext(Context pContext) {
+		LibraryActivity._Context = pContext;
+	}
+	private static void setEvilLibraryManager(EvilLibraryManager pEvilLibraryManager) {
+		LibraryActivity._EvilLibraryManager = pEvilLibraryManager;
+	}
+	private static void setTitlesAndAbsolutePaths(HashMap<String, String> pTitlesAndAbsolutePaths) {
+		LibraryActivity._TitlesAndAbsolutePaths = pTitlesAndAbsolutePaths;
+	}
+	
+	private static HashMap<String, String> getTitlesAndPaths() {
+		return LibraryActivity._TitlesAndAbsolutePaths;
+	}
+	
+	private static TextAdapter getTextAdapter() {
+		return LibraryActivity._TextAdapter;
+	}
+	
+	private static void setTextAdapter(TextAdapter pTextAdapter) {
+		LibraryActivity._TextAdapter = pTextAdapter;
+	}
 	
 	/**
 	 * Get context of this activity
 	 * @return
 	 */
 	public static Context getAppContext() {
-        return LibraryActivity.context;
+        return LibraryActivity._Context;
     }
 	
 	public void displayAllImages() {
@@ -114,12 +167,25 @@ public class LibraryActivity extends Activity {
 	public void displayEvilBooks() {
 		GridView gridview = (GridView) findViewById(R.id.gridview);
 		gridview.invalidateViews();
-		ArrayList<String> mEvilBooks = 
-				this._EvilLibraryManager.getListOfEvilBooksFromDB();
-		TextAdapter mTextAdapter = new TextAdapter(this, mEvilBooks);
-		mTextAdapter.notifyDataSetChanged();
-		gridview.setAdapter(mTextAdapter);
+		
+		LibraryActivity.renewAdapter();
+		
+		LibraryActivity.getTextAdapter().notifyDataSetChanged();
+		gridview.setAdapter(LibraryActivity.getTextAdapter());
 		gridview.setVisibility(View.VISIBLE);
+	}
+	
+	private static TextAdapter renewAdapter() {
+		TextAdapter aTextAdapter;
+		ArrayList<String> titles = new ArrayList<String>();
+		HashMap<String, String> aHashMap = 
+				LibraryActivity._EvilLibraryManager.getTitleAndPathHashMap();
+		LibraryActivity.setTitlesAndAbsolutePaths(aHashMap);
+		titles.addAll(aHashMap.keySet());
+		aTextAdapter = new TextAdapter(LibraryActivity._Context, titles);
+		LibraryActivity.setTextAdapter(aTextAdapter);
+		Log.e("EVILREADER", "" + titles.size());
+		return LibraryActivity.getTextAdapter();
 	}
 	
 	/**
