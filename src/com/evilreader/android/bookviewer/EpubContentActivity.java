@@ -4,13 +4,20 @@ import com.evilreader.android.R;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.ClipboardManager;
+import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class EpubContentActivity extends Activity {
 	// private constants
@@ -18,7 +25,8 @@ public class EpubContentActivity extends Activity {
 	private final int resourceIDSample = R.raw.asd;
 
 	// private members
-	private WebView webviewPage1;
+	final String javaScriptLibraries = "<html><head><script src='../assets/jquery.js'></script><script src='f../assets/rangy-core.js'></script><script src='../assets/rangy-serializer.js'></script><script src='../assets/android.selection.js'></script></head><body>";
+	private EvilreaderWebView webviewPage1;
 	private TextView textView1;
 
 	private int currentChapterIndex;
@@ -31,11 +39,15 @@ public class EpubContentActivity extends Activity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		webviewPage1 = (WebView) findViewById(R.id.webView1);
-		int width = webviewPage1.getWidth();
+		webviewPage1 = (EvilreaderWebView) findViewById(R.id.webView);
+		
+		String filePath = "file:///android_asset/content.html";
+		webviewPage1.loadUrl(filePath);
+		
+		/*int width = webviewPage1.getWidth();
 		int height = webviewPage1.getHeight();
 		WebSettings webViewPage1Settings = webviewPage1.getSettings();
-		//webViewPage1Settings.get
+		// webViewPage1Settings.get
 		int fontSize = webViewPage1Settings.getDefaultFontSize();
 
 		// textView1 = (TextView) findViewById(R.id.textView1);
@@ -67,7 +79,7 @@ public class EpubContentActivity extends Activity {
 				if (chapterContent != null || chapterContent != "") {
 
 					webviewPage1.setClickable(true);
-					webviewPage1.loadData(chapterContent, "text/html", null);
+					webviewPage1.loadData(javaScriptLibraries + chapterContent + "</body></html>", "text/html", null);
 
 					// textView1.setText(chapterContent);
 				}
@@ -89,23 +101,21 @@ public class EpubContentActivity extends Activity {
 
 						webviewPage1.setClickable(true);
 						webviewPage1
-								.loadData(chapterContent, "text/html", null);
-
-						/* textView1.setText(chapterContent); */
+								.loadData(javaScriptLibraries + chapterContent+ "</body></html>", "text/html", null);						
 					}
 				}
 
 			}
 		});
-
-		// textView1.setText(ebookFileManagerInstance.GetFirstPage());
-		webviewPage1.loadData(ebookFileManagerInstance.GetFirstPage(),
-				"text/html", "UTF-8");
+		
+		webviewPage1.loadData(javaScriptLibraries + ebookFileManagerInstance.GetFirstPage()+ "</body></html>",
+				"text/html", "UTF-8");*/
 	}
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_epub_content, menu);
-		return true;
+		return super.onCreateOptionsMenu(menu);
 	}
 }

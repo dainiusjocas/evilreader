@@ -32,9 +32,9 @@
             
         </activity>
         <activity
-            android:name="com.evilreader.android.epubcontentcontrol.EpubContentActivity"
+            android:name="com.evilreader.android.bookviewer.EpubContentActivity"
             android:label="@string/title_activity_epub_content" >
-            <intent-filter>
+             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
