@@ -4,20 +4,12 @@ import com.evilreader.android.R;
 
 import android.os.Bundle;
 import android.app.Activity;
-import android.content.ClipboardManager;
-import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class EpubContentActivity extends Activity {
 	// private constants
@@ -27,7 +19,6 @@ public class EpubContentActivity extends Activity {
 	// private members
 	final String javaScriptLibraries = "<html><head><script src='../../assets/jquery.js'></script><script src='../../assets/rangy-core.js'></script><script src='../../assets/rangy-serializer.js'></script><script src='../../assets/android.selection.js'></script></head><body>";
 	private EvilreaderWebView webviewPage1;
-	private TextView textView1;
 
 	private int currentChapterIndex;
 
@@ -41,16 +32,14 @@ public class EpubContentActivity extends Activity {
 
 		webviewPage1 = (EvilreaderWebView) findViewById(R.id.webView);
 		
-		//String filePath = "file:///android_asset/content.html";
-		//webviewPage1.loadUrl(filePath);
+		String filePath = "file:///android_asset/content.html";
+		webviewPage1.loadUrl(filePath);
 		
-		int width = webviewPage1.getWidth();
+		/*int width = webviewPage1.getWidth();
 		int height = webviewPage1.getHeight();
 		WebSettings webViewPage1Settings = webviewPage1.getSettings();
 		// webViewPage1Settings.get
 		int fontSize = webViewPage1Settings.getDefaultFontSize();
-
-		// textView1 = (TextView) findViewById(R.id.textView1);
 
 		EbookFileManager ebookFileManagerInstance = EbookFileManager
 				.getInstance();
@@ -109,7 +98,7 @@ public class EpubContentActivity extends Activity {
 		});
 		
 		webviewPage1.loadData(javaScriptLibraries + ebookFileManagerInstance.GetFirstPage()+ "</body></html>",
-				"text/html", "UTF-8");
+				"text/html", "UTF-8");*/
 	}
 	
 

@@ -4,7 +4,7 @@
     android:layout_height="fill_parent"
     tools:context=".EpubContentActivity" >
     
-                  <view class="com.evilreader.android.bookviewer.EvilreaderWebView"
+    <view class="com.evilreader.android.evilcontentcontroller.EvilreaderWebView"
 	    android:layout_width="match_parent" 
 	    android:layout_height="match_parent" 
 	    android:id="@+id/webView"/>
@@ -26,8 +26,6 @@
             android:layout_alignBaseline="@+id/EpubContentNextPage"
             android:layout_alignBottom="@+id/EpubContentNextPage"
             android:layout_alignParentLeft="true"
-            android:text="Previous" />
-
-        
+            android:text="Previous" />       
 
 </RelativeLayout>
