@@ -110,26 +110,32 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 
 	protected void setup(Context context) {
 
-		// On Touch Listener
-		this.setOnLongClickListener(this);
-		this.setOnTouchListener(this);
+		try {
+			// On Touch Listener
+			this.setOnLongClickListener(this);
+			this.setOnTouchListener(this);
 
-		// Webview setup
-		this.getSettings().setJavaScriptEnabled(true);
-		this.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-		this.getSettings().setPluginsEnabled(true);
+			// Webview setup
+			this.getSettings().setJavaScriptEnabled(true);
+			this.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+			this.getSettings().setPluginsEnabled(true);
 
-		// Javascript interfaces
-		 this.textSelectionJSInterface = new TextSelectionJavascriptInterface(context, this);
-		 this.addJavascriptInterface(this.textSelectionJSInterface, this.textSelectionJSInterface.getInterfaceName());
+			// Javascript interfaces
+			this.textSelectionJSInterface = new TextSelectionJavascriptInterface(
+					context, this);
+			this.addJavascriptInterface(this.textSelectionJSInterface,
+					this.textSelectionJSInterface.getInterfaceName());
 
-		// Create the selection handles
-		createSelectionLayer(context);
+			// Create the selection handles
+			createSelectionLayer(context);
 
-		// Set to the empty region
-		Region region = new Region();
-		region.setEmpty();
-		this.lastSelectedRegion = region;
+			// Set to the empty region
+			Region region = new Region();
+			region.setEmpty();
+			this.lastSelectedRegion = region;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	protected void createSelectionLayer(Context context) {

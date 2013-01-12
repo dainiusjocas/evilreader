@@ -15,6 +15,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+       
         <activity
             android:name=".TESTActivity"
             android:label="@string/title_activity_test" >
@@ -36,9 +37,10 @@
             android:screenOrientation="sensor"
             android:theme="@android:style/Theme.Holo" >
         </activity>
-        <activity
-            android:name=".evilcontentcontroller.EpubContentActivity"
+         <activity
+            android:name="com.evilreader.android.evilcontentcontroller.EpubContentActivity"
             android:label="@string/title_activity_epub_content" >
+            
         </activity>
         
     </application>
