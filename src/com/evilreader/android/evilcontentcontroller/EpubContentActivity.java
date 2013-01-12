@@ -1,5 +1,10 @@
 package com.evilreader.android.evilcontentcontroller;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.evilreader.android.R;
 
 import android.os.Bundle;
@@ -9,7 +14,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.widget.Button;
-import android.widget.TextView;
 
 public class EpubContentActivity extends Activity {
 	// private constants
@@ -17,7 +21,7 @@ public class EpubContentActivity extends Activity {
 	private final int resourceIDSample = R.raw.asd;
 
 	// private members
-	final String javaScriptLibraries = "<html><head><script src='../../assets/jquery.js'></script><script src='../../assets/rangy-core.js'></script><script src='../../assets/rangy-serializer.js'></script><script src='../../assets/android.selection.js'></script></head><body>";
+	private String javaScriptLibraries = "<html><head><script type='text/javascript' src='file:///android_asset/jquery.js'></script><script type='text/javascript' src='file:///android_asset/rangy-core.js'></script><script type='text/javascript' src='file:///android_asset/rangy-serializer.js'></script><script type='text/javascript' src='file:///android_asset/android.selection.js'></script></head><body>";
 	private EvilreaderWebView webviewPage1;
 
 	private int currentChapterIndex;
@@ -32,10 +36,11 @@ public class EpubContentActivity extends Activity {
 
 		webviewPage1 = (EvilreaderWebView) findViewById(R.id.webView);
 		
-		String filePath = "file:///android_asset/content.html";
-		webviewPage1.loadUrl(filePath);
+		/*String filePath = "file:///android_asset/content.html";
+		webviewPage1.loadUrl(filePath);*/
 		
-		/*int width = webviewPage1.getWidth();
+		
+		int width = webviewPage1.getWidth();
 		int height = webviewPage1.getHeight();
 		WebSettings webViewPage1Settings = webviewPage1.getSettings();
 		// webViewPage1Settings.get
@@ -57,7 +62,7 @@ public class EpubContentActivity extends Activity {
 		}
 
 		// The button for going through chapters forward
-		final Button button1 = (Button) findViewById(R.id.button1);
+		final Button button1 = (Button) findViewById(R.id.EpubContentNextPage);
 		button1.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				currentChapterIndex++;
@@ -68,7 +73,7 @@ public class EpubContentActivity extends Activity {
 				if (chapterContent != null || chapterContent != "") {
 
 					webviewPage1.setClickable(true);
-					webviewPage1.loadData(javaScriptLibraries + chapterContent + "</body></html>", "text/html", null);
+					webviewPage1.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + chapterContent + "</body></html>", "text/html", "UTF-8", "");
 
 					// textView1.setText(chapterContent);
 				}
@@ -76,7 +81,7 @@ public class EpubContentActivity extends Activity {
 		});
 
 		// The button for going through chapters backward
-		final Button button2 = (Button) findViewById(R.id.button2);
+		final Button button2 = (Button) findViewById(R.id.EpubContentPreviousPage);
 		button2.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
@@ -90,15 +95,15 @@ public class EpubContentActivity extends Activity {
 
 						webviewPage1.setClickable(true);
 						webviewPage1
-								.loadData(javaScriptLibraries + chapterContent+ "</body></html>", "text/html", null);						
+								.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + chapterContent+ "</body></html>", "text/html", "UTF-8", "");						
 					}
 				}
 
 			}
 		});
 		
-		webviewPage1.loadData(javaScriptLibraries + ebookFileManagerInstance.GetFirstPage()+ "</body></html>",
-				"text/html", "UTF-8");*/
+		webviewPage1.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + ebookFileManagerInstance.GetFirstPage() + "</body></html>",
+				"text/html", "UTF-8", "");
 	}
 	
 

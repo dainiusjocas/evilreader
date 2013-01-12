@@ -490,23 +490,18 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		//Copy action item
 		ActionItem buttonOne = new ActionItem();
 		 
-		buttonOne.setTitle("Button 1");
+		buttonOne.setTitle("Add bookmark");
 		buttonOne.setActionId(1);
-		buttonOne.setIcon(getResources().getDrawable(R.drawable.menu_search));
+		buttonOne.setIcon(getResources().getDrawable(R.drawable.rating));
 		
 		 
 		//Highlight action item
 		ActionItem buttonTwo = new ActionItem();
 		 
-		buttonTwo.setTitle("Button 2");
+		buttonTwo.setTitle("Add highlight");
 		buttonTwo.setActionId(2);
-		buttonTwo.setIcon(getResources().getDrawable(R.drawable.menu_info));
+		buttonTwo.setIcon(getResources().getDrawable(R.drawable.highlight));
 		
-		ActionItem buttonThree = new ActionItem();
-		
-		buttonThree.setTitle("Button 3");
-		buttonThree.setActionId(3);
-		buttonThree.setIcon(getResources().getDrawable(R.drawable.menu_eraser));
 		 
 		
 		
@@ -518,8 +513,6 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		mContextMenu.addActionItem(buttonOne);
 		
 		mContextMenu.addActionItem(buttonTwo);
-		
-		mContextMenu.addActionItem(buttonThree);
 		
 		
 		

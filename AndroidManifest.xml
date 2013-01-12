@@ -39,7 +39,8 @@
         </activity>
          <activity
             android:name="com.evilreader.android.evilcontentcontroller.EpubContentActivity"
-            android:label="@string/title_activity_epub_content" >
+            android:label="@string/title_activity_epub_content" 
+            android:theme="@android:style/Theme.Black">
             
         </activity>
         
