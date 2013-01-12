@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="8"
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -34,7 +34,7 @@
             android:icon="@drawable/ic_rating_good"
             android:label="@string/title_activity_library"
             android:screenOrientation="sensor"
-            android:theme="@android:style/Theme.Holo" >
+            android:theme="@android:style/Theme.Black" >
         </activity>
         <activity
             android:name=".evilcontentcontroller.EpubContentActivity"
