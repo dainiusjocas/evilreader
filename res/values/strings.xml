@@ -9,5 +9,6 @@
     <string name="no_notes">There is no notes! Make one!</string>
     <string name="library">Go to Library</string>
     <string name="title_activity_library">EvilLibrary</string>
+    <string name="title_activity_test">TESTActivity</string>
 
 </resources>

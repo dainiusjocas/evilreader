@@ -10,17 +10,17 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	/* Database integration */
-	private DBAdapter mDbAdapter;
+	//private DBAdapter mDbAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String value = getIntent().getExtras().getString("absolute_path");
+       /* String value = getIntent().getExtras().getString("absolute_path");
         Log.e("EVILREADER", value);
         TextView aTextView = (TextView) findViewById(R.id.textView1);
         Log.e("EVILREADER", "" + aTextView.getText());
-        aTextView.setText(value);
+        aTextView.setText(value);*/
     }
 
     @Override
