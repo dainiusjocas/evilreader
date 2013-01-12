@@ -4,22 +4,13 @@
     android:layout_height="fill_parent"
     tools:context=".EpubContentActivity" >
     
-          <WebView
-            android:id="@+id/webView1"
-        	android:layout_width="match_parent"
-        	android:layout_height="wrap_content" />
-
-		<!-- <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-          	/> -->
-		
+                  <view class="com.evilreader.android.bookviewer.EvilreaderWebView"
+	    android:layout_width="match_parent" 
+	    android:layout_height="match_parent" 
+	    android:id="@+id/webView"/>
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/EpubContentNextPage"
             style="@style/AppTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -28,12 +19,12 @@
             android:text="    Next    " />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/EpubContentPreviousPage"
             style="@style/AppTheme"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/button1"
-            android:layout_alignBottom="@+id/button1"
+            android:layout_alignBaseline="@+id/EpubContentNextPage"
+            android:layout_alignBottom="@+id/EpubContentNextPage"
             android:layout_alignParentLeft="true"
             android:text="Previous" />
 
