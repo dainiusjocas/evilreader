@@ -10,5 +10,8 @@
     <string name="library">Go to Library</string>
     <string name="title_activity_library">EvilLibrary</string>
     <string name="title_activity_test">TESTActivity</string>
+    <string name="title_activity_evil_library">EvilLibraryActivity</string>
+    <string name="refresh_library">Refresh</string>
+    <string name="import_book">Import a book</string>
 
 </resources>

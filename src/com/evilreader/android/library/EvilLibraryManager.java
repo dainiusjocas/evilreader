@@ -20,7 +20,7 @@ import android.util.Log;
 public class EvilLibraryManager {
 	
 	// Context that we are executing
-	Context _Context;
+	private Context _Context;
 	// Database controller
 	private DBAdapter _DBAdapter;
 	// Scanner for Evil Library
@@ -51,30 +51,7 @@ public class EvilLibraryManager {
 		this._EvilLibraryScanner = 
 				new EvilLibraryScanner(this._EvilLibraryDirectory);
 	}
-		
-	public ArrayList<String> getListOfEvilBooksFromDB() {
-		ArrayList<String> listOfEvilBooks = new ArrayList<String>();
-		this._DBAdapter.open();
-		Cursor cursor = this._DBAdapter.getTitlesOfEvilBooks();
-		// Maybe there should be a check if there are elements
-		// If not then a message should be displayed.
-		if (!cursor.moveToFirst()) {
-			listOfEvilBooks.add("NO EVIL BOOKS IN THE LIBRARY"); // mock for message
-			return listOfEvilBooks;
-		}
-		do {
-			listOfEvilBooks.add(cursor.getString(0));
-		} while(cursor.moveToNext());
-		// query database for list of books that were available in the past
-		// and assign it to the variable listOfEvilBooks
-		this._DBAdapter.close();
-		return listOfEvilBooks;
-	}
-	
-	public ArrayList<String> getListOfEvilBooks() {
-		return this._ListOfEvilBooks;
-	}
-	
+
 	/**
 	 * Checks if directory in the external storage (e.g. sdcard) for eBooks
 	 * exists, and if not creates it. If external storage is not writable and
@@ -112,6 +89,32 @@ public class EvilLibraryManager {
 		}
 		
 		return directoryForEvilLibrary;
+	}
+	
+	private ArrayList<String> getListOfEvilBooksFromDB() {
+		ArrayList<String> listOfEvilBooks = new ArrayList<String>();
+		this._DBAdapter.open();
+		Cursor aCursor = this._DBAdapter.getTitlesOfEvilBooks();
+		// Maybe there should be a check if there are elements
+		// If not then a message should be displayed.
+		if (!aCursor.moveToFirst()) {
+			listOfEvilBooks.add("NO EVIL BOOKS IN THE LIBRARY"); // mock for message
+			aCursor.close();
+			this._DBAdapter.close();
+			return listOfEvilBooks;
+		}
+		do {
+			listOfEvilBooks.add(aCursor.getString(0));
+		} while(aCursor.moveToNext());
+		// query database for list of books that were available in the past
+		// and assign it to the variable listOfEvilBooks
+		aCursor.close();
+		this._DBAdapter.close();
+		return listOfEvilBooks;
+	}
+	
+	public ArrayList<String> getListOfEvilBooks() {
+		return this._ListOfEvilBooks;
 	}
 	
 	private boolean isEvilLibraryDirectoryPresent() {
@@ -157,7 +160,6 @@ public class EvilLibraryManager {
 					this._EvilLibraryDirectory.getAbsolutePath() 
 					+ "/" 
 					+ evilBook;
-			
 			EvilBook aEvilBook = new EvilBook(anAbsolutePath);
 			aEvilBook.getTitle();
 			authors = aEvilBook.getAuthors().trim();
@@ -165,6 +167,7 @@ public class EvilLibraryManager {
 			year = aEvilBook.getYear();
 			filename = evilBook;
 			path = anAbsolutePath;
+			
 			this._DBAdapter.open();
 			this._DBAdapter.storeEvilBook(title, authors, year, filename, path);
 			this._DBAdapter.close();
@@ -175,18 +178,22 @@ public class EvilLibraryManager {
 	public void refreshListOfEvilBooks() {
 		ArrayList<String> evilFiles = getListOfFileNamesOfePubFiles();
 		storeEvilBooks(evilFiles);
-		markEvilBooksThatAreNotPresent();
+		//markEvilBooksThatAreNotPresent();
 	}
 	
 	/**
 	 * Marks evil books that file path is not valid.
 	 */
-	public void markEvilBooksThatAreNotPresent() {
+	private void markEvilBooksThatAreNotPresent() {
 		this._DBAdapter.open();
 		// two columns - [0] - absolute path, [1] - id
 		Cursor aCursor = this._DBAdapter.fetchAllEvilBooks();
 		if (!aCursor.moveToFirst()) {
-			Log.e("EVILREADER", "NO EVIL BOOKS IN THE LIBRARY");
+			//Log.e("EVILREADER ERROR", "NO EVIL BOOKS IN THE LIBRARY");
+			this.refreshListOfEvilBooks();
+			aCursor.close();
+			this._DBAdapter.close();
+			return;
 		}
 		do {
 			File aFile = new File(aCursor.getString(0));
@@ -195,6 +202,7 @@ public class EvilLibraryManager {
 				this._DBAdapter.markEvilBookStatus(aRowId, "false");
 			}
 		} while(aCursor.moveToNext());
+		aCursor.close();
 		this._DBAdapter.close();
 	}
 	
@@ -208,13 +216,41 @@ public class EvilLibraryManager {
 		HashMap<String, String> aHashMap = new HashMap<String, String>();
 		Cursor aCursor = this._DBAdapter.getTitlesAndPathsOfEvilBooks();
 		if (!aCursor.moveToFirst()) {
-			Log.e("EVILREADER", "NO EVIL BOOKS IN THE LIBRARY");
+			//Log.e("EVILREADER2", "NO EVIL BOOKS IN THE LIBRARY");
+			aHashMap.put("NO EVIL BOOKS IN THE LIBRARY", "EVILREADER");
+			aCursor.close();
+			this._DBAdapter.close();
+			return aHashMap;
 		}
 		do {
 			aHashMap.put(aCursor.getString(0), aCursor.getString(1));
 		} while(aCursor.moveToNext());
+		aCursor.close();
 		this._DBAdapter.close();
 		return aHashMap;
+	}
+	
+	public ArrayList<EvilTriple> getTitlePathId() {
+		this._DBAdapter.open();
+		ArrayList<EvilTriple> aTitlePathId = new ArrayList<EvilTriple>();
+		Cursor aCursor = this._DBAdapter.getTitlesPathsIdsOfEvilBooks();
+		if (!aCursor.moveToFirst()) {
+			//Log.e("EVILREADER2", "NO EVIL BOOKS IN THE LIBRARY");
+			EvilTriple aTriple =  
+					new EvilTriple ("NO EVIL BOOKS IN THE LIBRARY",
+							"EVILREADER", "Evilreader");
+			aCursor.close();
+			this._DBAdapter.close();
+			aTitlePathId.add(aTriple);
+			return aTitlePathId;
+		}
+		do {
+			EvilTriple anEvilTriple = new EvilTriple(aCursor.getString(0), aCursor.getString(1), aCursor.getString(2));
+			aTitlePathId.add(anEvilTriple);
+		} while(aCursor.moveToNext());
+		aCursor.close();
+		this._DBAdapter.close();
+		return aTitlePathId;
 	}
 	
 	// getCoverImages

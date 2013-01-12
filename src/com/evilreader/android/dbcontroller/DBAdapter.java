@@ -29,7 +29,7 @@ public class DBAdapter implements EvilBookTable {
 	 * Names and definitions for the EvilReader DB
 	 *************************************************************************/
 	public static final String DATABASE_NAME = "evilreaderdb";
-	public static final int DATABASE_VERSION = 18;
+	public static final int DATABASE_VERSION = 1;
 	
 	/**************************************************************************
 	 * DEFINITIONS FOR NOTE TABLE
@@ -115,7 +115,7 @@ public class DBAdapter implements EvilBookTable {
 	        + EVILBOOK_ROWID
 	        + " integer primary key autoincrement, "
 	        + EVILBOOK_ID
-	        + " text unique, "
+	        + " text not null unique, "
 	        + EVILBOOK_TITLE
 	        + " text, "
 	        + EVILBOOK_AUTHOR 
@@ -414,6 +414,12 @@ public class DBAdapter implements EvilBookTable {
     	return cursorToTitlesOfEvilBooks;
     }
     
+    /**
+     * Collects all titles and absolute paths from evil books that are present
+     * in the DB.
+     * 
+     * @return Cursor to query result
+     */
     public Cursor getTitlesAndPathsOfEvilBooks() {
     	Cursor aCursorToTitlesAndPaths;
     	String[] columns = {EVILBOOK_TITLE, EVILBOOK_ABSOLUTE_PATH};
@@ -470,4 +476,19 @@ public class DBAdapter implements EvilBookTable {
     	return isUpdated;
     }
     /*************************************************************************/
+
+	public Cursor getTitlesPathsIdsOfEvilBooks() {
+		Cursor aCursorToTitlesPathsAndIds;
+    	String[] columns = {EVILBOOK_TITLE, EVILBOOK_ABSOLUTE_PATH, EVILBOOK_ID};
+    	String[] selectionArgs = {"true"};
+    	aCursorToTitlesPathsAndIds = this.mDb.query(
+    			EVILBOOK_TABLE_TITLE, 
+    			columns, 
+    			EVILBOOK_IS_PRESENT + " = ?", 
+    			selectionArgs, 
+    			null, 
+    			null, 
+    			null);
+    	return aCursorToTitlesPathsAndIds;
+	}
 }

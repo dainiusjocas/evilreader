@@ -1,15 +1,10 @@
 package com.evilreader.android.library;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,187 +13,121 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.evilreader.android.R;
-import com.evilreader.android.dbcontroller.DBAdapter;
 
 public class LibraryActivity extends Activity {
-	/* Database integration */
-	private DBAdapter mDbAdapter;
 	
-	/* Evil Library Manager */
-	private static EvilLibraryManager _EvilLibraryManager;
-	
-	private static Context _Context;
-	private Bundle _SavedInstanceState;
-	private static TextAdapter _TextAdapter;
-	private static HashMap<String, String> _TitlesAndAbsolutePaths;
-	private static ArrayList<String> _Titles = new ArrayList<String>();
-	
-	
+	private ArrayList<String> titles = new ArrayList<String>();
+	private static ArrayList<EvilTriple> evilTriples; //title, path, id
+	private EvilLibraryManager evilLibraryManager;
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		LibraryActivity.setContext(getApplicationContext());
-		this._SavedInstanceState = savedInstanceState;
-		LibraryActivity.setEvilLibraryManager(new EvilLibraryManager(this));
-		
-		HashMap<String, String> aHashMapOfTitlesAndPaths = 
-				LibraryActivity._EvilLibraryManager.getTitleAndPathHashMap();
-		LibraryActivity.setTitlesAndAbsolutePaths(aHashMapOfTitlesAndPaths);
-		
-		LibraryActivity.setTitles(LibraryActivity.getTitlesFromHashMapOfTitlesAndPaths());
-		
-		setContentView(R.layout.activity_library);
-		
+		setContentView(R.layout.activity_evil_library);
 		// Impossible to set fullscreen in layout xml file, so it is done here
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		this.evilLibraryManager = new EvilLibraryManager(this.getApplicationContext());
 
-		GridView gridview = (GridView) findViewById(R.id.gridview);
+		getEvilBooks();
+		
+		GridView gridview = (GridView) findViewById(R.id.evil_library_gridview);
 		TextAdapter aTextAdapter = 
-				new TextAdapter(LibraryActivity.getAppContext(),
-						LibraryActivity.getTitles());
-		
-		LibraryActivity.setTextAdapter(aTextAdapter);
-		gridview.setAdapter(LibraryActivity.getTextAdapter());
-		
+				new TextAdapter(getApplicationContext(), this.titles);
+		gridview.setAdapter(aTextAdapter);
 		gridview.setOnItemClickListener(new OnItemClickListener() {
-	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	        	// here is the place to react when item is pressed
-	        	String aTitle = 
-	        			LibraryActivity.getTextAdapter().getTitle(position);
-	        	String aPath = LibraryActivity._TitlesAndAbsolutePaths.get(aTitle);
-	        	Log.e("EVILREADER", aPath);
-	        	Bundle extras = new Bundle();
-	        	extras.putString("absolute_path", aPath);
-	        	Intent aIntent = new Intent(LibraryActivity.this, com.evilreader.android.MainActivity.class);
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+				// according to position take element from the grid and call for another activity.
+				Log.e("EVILPAR", "pos: " + position);
+				Log.e("EVILPAR", "title" + LibraryActivity.evilTriples.get(position).getEvilTitle());
+				Log.e("EVILPAR", "path" + LibraryActivity.evilTriples.get(position).getEvilPath());
+				Log.e("EVILPAR", "id" + LibraryActivity.evilTriples.get(position).getEvilId());
+				Bundle extras = new Bundle();
+				extras.putString("evil_title", LibraryActivity.evilTriples.get(position).getEvilTitle());
+				extras.putString("evil_path", LibraryActivity.evilTriples.get(position).getEvilPath());
+				extras.putString("evil_id", LibraryActivity.evilTriples.get(position).getEvilId());
+				Intent aIntent = new Intent(LibraryActivity.this, com.evilreader.android.TESTActivity.class);
 	        	aIntent.putExtras(extras);
 	        	startActivity(aIntent);
-	        	//Toast.makeText(LibraryActivity.this, "" + position, Toast.LENGTH_SHORT).show();
-	        }
-	    });
+        		return;	        	
+		}});
 		
-		//gridview.setAdapter(new ImageAdapter(this));
-		
-/*		gridview.setOnItemClickListener(new OnItemClickListener() {
-	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	        	Intent mIntent = new Intent(LibraryActivity.this, com.evilreader.android.epubcontentcontrol.EpubContentActivity.class);
-				startActivity(mIntent);
-	            //Toast.makeText(LibraryActivity.this, "" + position, Toast.LENGTH_SHORT).show();
-	        }
-	    });*/
-
-	}
-	private static void setTitles(Set<String> pTitles) {
-		LibraryActivity._Titles.addAll(pTitles);
-	}
-	private static ArrayList<String> getTitles() {
-		return LibraryActivity._Titles;
-	}
-	private static Set<String> getTitlesFromHashMapOfTitlesAndPaths() {
-		Set<String> titles = LibraryActivity._TitlesAndAbsolutePaths.keySet();
-		return titles;
-	}
-	private static void setContext(Context pContext) {
-		LibraryActivity._Context = pContext;
-	}
-	private static void setEvilLibraryManager(EvilLibraryManager pEvilLibraryManager) {
-		LibraryActivity._EvilLibraryManager = pEvilLibraryManager;
-	}
-	private static void setTitlesAndAbsolutePaths(HashMap<String, String> pTitlesAndAbsolutePaths) {
-		LibraryActivity._TitlesAndAbsolutePaths = pTitlesAndAbsolutePaths;
 	}
 	
-	private static HashMap<String, String> getTitlesAndPaths() {
-		return LibraryActivity._TitlesAndAbsolutePaths;
+	private ArrayList<EvilTriple> getEvilTriples() {
+		return this.evilLibraryManager.getTitlePathId();
 	}
 	
-	private static TextAdapter getTextAdapter() {
-		return LibraryActivity._TextAdapter;
-	}
-	
-	private static void setTextAdapter(TextAdapter pTextAdapter) {
-		LibraryActivity._TextAdapter = pTextAdapter;
-	}
-	
-	/**
-	 * Get context of this activity
-	 * @return
-	 */
-	public static Context getAppContext() {
-        return LibraryActivity._Context;
-    }
-	
-	public void displayAllImages() {
-		GridView gridview = (GridView) findViewById(R.id.gridview);
-		gridview.setAdapter(new ImageAdapter(this));
-		gridview.setVisibility(View.VISIBLE);
-		//v.setVisibility(View.INVISIBLE);
+	private void getEvilBooks() { 
+		this.evilTriples = this.getEvilTriples();
+		this.titles = new ArrayList<String>();
+		for (int i = 0; i < this.evilTriples.size(); i++) {
+			this.titles.add(this.evilTriples.get(i).getEvilTitle());
+		}
+		return;
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_library, menu);
-		return super.onCreateOptionsMenu(menu);
+		getMenuInflater().inflate(R.menu.activity_evil_library, menu);
+		return true;
 	}
 	
+	/**
+	 * Handles menu button clicks.
+	 */
 	public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
          switch (item.getItemId()) {
-         case R.id.search_book:
+         case R.id.menu_import_book:
         	 // do something here because search button is pressed
-        	 displayEvilMessage("Search for Evil Books!");
+        	 displayEvilMessage("Import an Evil Book!");
              return true;
-         case R.id.refresh_library:
-        	 // TODO(dainius): scan evil library, put books to the db, fill the grid, show the grid
-        	 // refresh button is pressed
-        	 this._EvilLibraryManager.refreshListOfEvilBooks();
-        	 this.displayEvilBooks();
-        	 //displayAllImages(); // make visible images
-        	 displayEvilMessage("Refresh Evil Library!");
+         case R.id.menu_refresh_library:
+        	 refreshGridView();
         	 return true;
+         case R.id.menu_settings:
+        	 // TODO(dainius)
+        	 displayEvilMessage("Menu settings");
          }
          return false;
 	}
 	
-	public void displayEvilBooks() {
-		GridView gridview = (GridView) findViewById(R.id.gridview);
+	/**
+	 * Refreshes content that needs to be displayed, and refreshes the grid.
+	 */
+	private void refreshGridView() {
+		// getting new content ------------------------------------------------
+		ArrayList<String> refreshedContent;
+		evilLibraryManager.refreshListOfEvilBooks();
+		getEvilBooks();
+		refreshedContent = this.titles;
+		// refreshing the gridview---------------------------------------------
+		GridView gridview = (GridView) findViewById(R.id.evil_library_gridview);
 		gridview.invalidateViews();
-		
-		LibraryActivity.renewAdapter();
-		
-		LibraryActivity.getTextAdapter().notifyDataSetChanged();
-		gridview.setAdapter(LibraryActivity.getTextAdapter());
+		gridview.invalidate();
+		TextAdapter aTextAdapter = 
+				new TextAdapter(getApplicationContext(), refreshedContent);
+		aTextAdapter.notifyDataSetChanged();
+		gridview.setAdapter(aTextAdapter);
 		gridview.setVisibility(View.VISIBLE);
-	}
-	
-	private static TextAdapter renewAdapter() {
-		TextAdapter aTextAdapter;
-		ArrayList<String> titles = new ArrayList<String>();
-		HashMap<String, String> aHashMap = 
-				LibraryActivity._EvilLibraryManager.getTitleAndPathHashMap();
-		LibraryActivity.setTitlesAndAbsolutePaths(aHashMap);
-		titles.addAll(aHashMap.keySet());
-		aTextAdapter = new TextAdapter(LibraryActivity._Context, titles);
-		LibraryActivity.setTextAdapter(aTextAdapter);
-		Log.e("EVILREADER", "" + titles.size());
-		return LibraryActivity.getTextAdapter();
+		// --------------------------------------------------------------------
+		return;
 	}
 	
 	/**
-	 * Invokes a Toast with specific message
-	 * @param message
+	 * Displays message in a Toast
+	 * @param evilMessage
 	 */
-	public void displayEvilMessage(String message) {
-		Context context = getApplicationContext();
-   	 	CharSequence text = message;
-   	 	int duration = Toast.LENGTH_SHORT;
-
-   	 	Toast toast = Toast.makeText(context, text, duration);
-   	 	toast.show();
+	private void displayEvilMessage(String evilMessage) {
+		Toast.makeText(LibraryActivity.this,
+				evilMessage,
+		Toast.LENGTH_LONG).show();
+		return;
 	}
-	
+
 }

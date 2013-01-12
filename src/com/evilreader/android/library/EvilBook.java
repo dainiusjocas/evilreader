@@ -8,6 +8,7 @@ import java.util.List;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Metadata;
+import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.epub.EpubReader;
 import android.util.Log;
 
@@ -65,20 +66,26 @@ public class EvilBook {
 	/**
 	 * Get year of publication
 	 * 
+	 * TODO(Dainius): fix problem with regex. To get year
 	 * @return String of format [0-9]{4}
 	 */
 	public String getYear() {
-		String regex = "[0-9]{4}"; // matches only years
+		//String regex = "[0-9]{4}"; // matches only years
 		String year = "";
 		List<nl.siegmann.epublib.domain.Date> dates = this._Metadata.getDates();
 		year = dates.get(0).toString();
-		String[] notMatch = year.split(regex, 4);
-		year = year.replace(notMatch[0], "");
-		year = year.replace(notMatch[1], "");
+		year = year.substring(0, 4);
+		//String[] notMatch = year.split(regex, 4);
+		//year = year.replace(notMatch[0], "");
+		//year = year.replace(notMatch[1], "");
 		return year;
 	}
 	
+	/**
+	 * Gets cover Image
+	 * TODO(Dainius)
+	 */
 	public void getCover() {
-		this._Book.getCoverImage();
+		Resource aResource = this._Book.getCoverImage();
 	}
 }
