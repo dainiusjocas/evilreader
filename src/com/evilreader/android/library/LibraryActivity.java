@@ -49,7 +49,8 @@ public class LibraryActivity extends Activity {
 				extras.putString("evil_title", LibraryActivity.evilTriples.get(position).getEvilTitle());
 				extras.putString("evil_path", LibraryActivity.evilTriples.get(position).getEvilPath());
 				extras.putString("evil_id", LibraryActivity.evilTriples.get(position).getEvilId());
-				Intent aIntent = new Intent(LibraryActivity.this, com.evilreader.android.TESTActivity.class);
+				Intent aIntent = new Intent(LibraryActivity.this, 
+						com.evilreader.android.evilcontentcontroller.EpubContentActivity.class);
 	        	aIntent.putExtras(extras);
 	        	startActivity(aIntent);
         		return;	        	
