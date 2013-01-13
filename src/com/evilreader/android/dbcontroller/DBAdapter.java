@@ -10,6 +10,8 @@
 
 package com.evilreader.android.dbcontroller;
 
+import com.evilreader.android.library.EvilTriple;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -599,6 +601,84 @@ public class DBAdapter implements EvilBookTable {
     			null, 
     			null);
     	return aCursorToTitlesPathsAndIds;
+	}
+	
+	public String getEvilBookAuthor(String pBookId) {
+		this.open();
+		String anAuthor = "";
+		Cursor aCursorToAuthor;
+		String[] column = {EVILBOOK_AUTHOR};
+		String[] selectionArgs = {pBookId};
+		aCursorToAuthor = this.mDb.query(
+    			EVILBOOK_TABLE_TITLE, 
+    			column, 
+    			EVILBOOK_ID + " = ?", 
+    			selectionArgs, 
+    			null, 
+    			null, 
+    			null);
+		if (!aCursorToAuthor.moveToFirst()) {
+			anAuthor = "Unknown";
+			aCursorToAuthor.close();
+			this.close();
+			return anAuthor;
+		}
+		anAuthor = aCursorToAuthor.getString(0);
+		aCursorToAuthor.close();
+		this.close();
+		return anAuthor;
+	}
+	
+	public String getEvilBookTitle(String pBookId) {
+		this.open();
+		String aTitle = "";
+		Cursor aCursorToTitle;
+		String[] column = {EVILBOOK_TITLE};
+		String[] selectionArgs = {pBookId};
+		aCursorToTitle = this.mDb.query(
+    			EVILBOOK_TABLE_TITLE, 
+    			column, 
+    			EVILBOOK_ID + " = ?", 
+    			selectionArgs, 
+    			null, 
+    			null, 
+    			null);
+		if (!aCursorToTitle.moveToFirst()) {
+			aTitle = "Unknown";
+			aCursorToTitle.close();
+			this.close();
+			return aTitle;
+		}
+		aTitle = aCursorToTitle.getString(0);
+		aCursorToTitle.close();
+		this.close();
+		return aTitle;
+	}
+		
+		public String getEvilBookYear(String pBookId) {
+			this.open();
+			String aYear = "";
+			Cursor aCursorToYear;
+			String[] column = {EVILBOOK_YEAR};
+			String[] selectionArgs = {pBookId};
+			aCursorToYear = this.mDb.query(
+	    			EVILBOOK_TABLE_TITLE, 
+	    			column, 
+	    			EVILBOOK_ID + " = ?", 
+	    			selectionArgs, 
+	    			null, 
+	    			null, 
+	    			null);
+			if (!aCursorToYear.moveToFirst()) {
+				aYear = "Unknown";
+				aCursorToYear.close();
+				this.close();
+				return aYear;
+			}
+			aYear = aCursorToYear.getString(0);
+			aCursorToYear.close();
+			this.close();
+			return aYear;
 	}
     /*************************************************************************/
 
