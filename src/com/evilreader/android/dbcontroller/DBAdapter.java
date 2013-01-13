@@ -29,7 +29,7 @@ public class DBAdapter implements EvilBookTable {
 	 * Names and definitions for the EvilReader DB
 	 *************************************************************************/
 	public static final String DATABASE_NAME = "evilreaderdb";
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 6;
 	
 	/**************************************************************************
 	 * DEFINITIONS FOR NOTE TABLE
@@ -38,8 +38,9 @@ public class DBAdapter implements EvilBookTable {
 	public static final String NOTE_ROWID = "rowid";
 	public static final String NOTE_BODY  = "body";
 	public static final String NOTE_BOOK_ID = "book_id";
-	public static final String NOTE_LOCATION_ID = "location_id";
-	private static final String DATABASE_CREATE_NOTES =
+	public static final String NOTE_CHAPTER = "chapter";
+	public static final String NOTE_PARAGRAPH = "paragraph";
+	private static final String CREATE_TABLE_NOTE =
 	        "create table " 
 	        + NOTE_TABLE_TITLE 
 	        + " ( "
@@ -49,9 +50,56 @@ public class DBAdapter implements EvilBookTable {
 	        + " text not null, "
 	        + NOTE_BOOK_ID 
 	        + " text not null, "
-	        + NOTE_LOCATION_ID
-	        + " text not null);";
+	        + NOTE_CHAPTER
+	        + " text not null, "
+	        + NOTE_PARAGRAPH
+	        + " text not null); ";
 	/*************************************************************************/
+	/**************************************************************************
+	 * DEFINITIONS FOR HIGHLIGHT TABLE
+	 *************************************************************************/
+	public static final String HIGHLIGHT_TABLE_TITLE = "highlight";
+	public static final String HIGHLIGHT_ROWID = "rowid";
+	public static final String HIGHLIGHT_BOOK_ID = "book_id";
+	public static final String HIGHLIGHT_CHAPTER = "chapter";
+	public static final String HIGHLIGHT_PARAGRAPH = "paragraph";
+	public static final String HIGHLIGHT_TEXT = "text"; 
+	private static final String CREATE_TABLE_HIGHLIGHT =
+	        "create table " 
+	        + HIGHLIGHT_TABLE_TITLE 
+	        + " ( "
+	        + HIGHLIGHT_ROWID
+	        + " integer primary key autoincrement, "
+	        + HIGHLIGHT_TEXT 
+	        + " text not null, "
+	        + HIGHLIGHT_BOOK_ID 
+	        + " text not null, "
+	        + HIGHLIGHT_CHAPTER
+	        + " text not null, "
+	        + HIGHLIGHT_PARAGRAPH
+	        + " text not null); ";
+	/*************************************************************************/
+	
+	/**************************************************************************
+	 * DEFINITIONS FOR BOOKMARK TABLE
+	 *************************************************************************/
+	public static String BOOKMARK_TABLE_TITLE = "bookmark";
+	public static String BOOKMARK_ROWID = "rowid";
+	public static String BOOKMARK_BOOK_ID = "bookid";
+	public static String BOOKMARK_CHAPTER = "chapter";
+	public static String BOOKMARK_PARAGRAPH = "paragraph";
+	public static String CREATE_TABLE_BOOKMARK = 
+			"create table " 
+			        + BOOKMARK_TABLE_TITLE 
+			        + " ( "
+			        + BOOKMARK_ROWID
+			        + " integer primary key autoincrement, "
+			        + BOOKMARK_BOOK_ID 
+			        + " text not null, "
+			        + BOOKMARK_CHAPTER
+			        + " text not null, "
+			        + BOOKMARK_PARAGRAPH
+			        + " text not null); ";
 	
 	/**************************************************************************
 	 * DEFINITION OF LOCATION TABLE
@@ -91,7 +139,7 @@ public class DBAdapter implements EvilBookTable {
 			+ " text not null);";
 	
 	/**************************************************************************
-	 * EVILBOOK table name
+	 * EVILBOOK table title
 	 *************************************************************************/
 	private static final String EVILBOOK_TABLE_TITLE = "evilbook";
 	/**************************************************************************
@@ -132,13 +180,7 @@ public class DBAdapter implements EvilBookTable {
     /*************************************************************************/
 	
 	//TODO(dainius): describe all the tables;
-	//TODO(dainius): add code for all the table handlers. 
-	
-	/**
-     * Database creation sql statement. For now its just one table EVILBOOK!
-     * TODO(dainius): rewrite for multitable case;
-     */
-    private static final String DATABASE_CREATE = CREATE_TABLE_EVILBOOK;    
+	//TODO(dainius): add code for all the table handlers.   
 	
 	private final static String TAG = "DBAdapter";
 	private DatabaseHelper mDbHelper;
@@ -197,21 +239,82 @@ public class DBAdapter implements EvilBookTable {
         }
 
         @Override
+        /**
+         * All the create table statements are executed in separate db.execSQL
+         * statements.
+         */
         public void onCreate(SQLiteDatabase db) {
-
-            db.execSQL(DATABASE_CREATE);
+            db.execSQL(CREATE_TABLE_EVILBOOK);
+            db.execSQL(CREATE_TABLE_NOTE);
+            db.execSQL(CREATE_TABLE_BOOKMARK);
+            db.execSQL(CREATE_TABLE_HIGHLIGHT);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
-            db.execSQL("DROP TABLE IF EXISTS " + NOTE_TABLE_TITLE);
             db.execSQL("DROP TABLE IF EXISTS " + EVILBOOK_TABLE_TITLE);
-            db.execSQL("DROP TABLE IF EXISTS " + LOCATION_TABLE_TITLE);
+            db.execSQL("DROP TABLE IF EXISTS " + BOOKMARK_TABLE_TITLE);
+            db.execSQL("DROP TABLE IF EXISTS " + NOTE_TABLE_TITLE);
+            db.execSQL("DROP TABLE IF EXISTS " + HIGHLIGHT_TABLE_TITLE);
             onCreate(db);
         }
     }
+    
+    /**************************************************************************
+     * Handlers for bookmarks
+     *************************************************************************/
+    public long storeBookmark(String pBookId, String pChapter, 
+    		String pParagraph) {
+    	ContentValues initialValues = new ContentValues();
+    	initialValues.put(BOOKMARK_BOOK_ID, pBookId);
+    	initialValues.put(BOOKMARK_CHAPTER, pChapter);
+    	initialValues.put(BOOKMARK_PARAGRAPH, pParagraph);
+    	return mDb.insert(BOOKMARK_TABLE_TITLE, null, initialValues);
+    }
+    
+    public Cursor fetchBookmarks(String pBookId) {
+    	String[] columns = 
+    		{BOOKMARK_BOOK_ID, BOOKMARK_CHAPTER, BOOKMARK_PARAGRAPH};
+    	String[] selectionArgs = {pBookId};
+    	Cursor cursor = mDb.query(
+    			BOOKMARK_TABLE_TITLE, 
+    			columns,
+    			BOOKMARK_BOOK_ID + " = ? ",
+    			selectionArgs,
+    			null, null, null);
+    	return cursor;
+    }
+    /*************************************************************************/
+    
+    /**************************************************************************
+     * Handlers for highlights
+     *************************************************************************/
+    public long storeHighlight(String pBookId, String pChapter, 
+    		String pParagraph, String pHighlightedText) {
+    	ContentValues initialValues = new ContentValues();
+    	initialValues.put(HIGHLIGHT_BOOK_ID, pBookId);
+    	initialValues.put(HIGHLIGHT_CHAPTER, pChapter);
+    	initialValues.put(HIGHLIGHT_PARAGRAPH, pParagraph);
+    	initialValues.put(HIGHLIGHT_TEXT, pHighlightedText);
+    	return mDb.insert(HIGHLIGHT_TABLE_TITLE, null, initialValues);
+    }
+    
+    public Cursor fetchHighlights(String pBookId) {
+    	String[] columns = 
+    		{HIGHLIGHT_BOOK_ID, HIGHLIGHT_CHAPTER, HIGHLIGHT_PARAGRAPH, 
+    			HIGHLIGHT_TEXT};
+    	String[] selectionArgs = {pBookId};
+    	Cursor cursor = mDb.query(
+    			HIGHLIGHT_TABLE_TITLE, 
+    			columns,
+    			HIGHLIGHT_BOOK_ID + " = ? ",
+    			selectionArgs,
+    			null, null, null);
+    	return cursor;
+    }
+    /*************************************************************************/
     
     /************************************************************************** 
      * This series of functions is dedicated to work with NOTES table
@@ -226,12 +329,31 @@ public class DBAdapter implements EvilBookTable {
      * @param bookId - to which book note is assigned
      * @return rowId or -1 if failed
      */
-    public long storeNote(String body, String bookId, String location_id) {
+    public long storeNote(String pBody, String pBookId, String pChapter,
+    		String pParagraph) {
     	ContentValues initialValues = new ContentValues();
-    	initialValues.put(NOTE_BODY, body);
-    	initialValues.put(NOTE_BOOK_ID, bookId);
-    	initialValues.put(NOTE_LOCATION_ID, location_id);
+    	initialValues.put(NOTE_BODY, pBody);
+    	initialValues.put(NOTE_BOOK_ID, pBookId);
+    	initialValues.put(NOTE_CHAPTER, pChapter);
+    	initialValues.put(NOTE_PARAGRAPH, pParagraph);
     	return mDb.insert(NOTE_TABLE_TITLE, null, initialValues);
+    }
+    
+    /**
+     * Get all notes for a specific book.
+     * @return cursor over all selected notes for a specific book.
+     */
+    public Cursor fetchAllNotes(String pBookId) {
+    	String[] columns = 
+    		{NOTE_BOOK_ID, NOTE_CHAPTER, NOTE_PARAGRAPH, NOTE_BODY};
+    	String[] selectionArgs = {pBookId};
+    	Cursor cursor = mDb.query(
+    			NOTE_TABLE_TITLE, 
+    			columns,
+    			NOTE_BOOK_ID + " = ? ",
+    			selectionArgs,
+    			null, null, null);
+    	return cursor;
     }
     
     /**
@@ -242,18 +364,6 @@ public class DBAdapter implements EvilBookTable {
     public boolean deleteNote(long rowId) {
     	return mDb.delete(NOTE_TABLE_TITLE, NOTE_BOOK_ID + "=" + rowId,
     			null) > 0;
-    }
-    
-    /**
-     * Get all notes for a specific book.
-     * @return cursor over all selected notes for a specific book.
-     */
-    public Cursor fetchAllNotes(long bookId) {
-    	Cursor cursor = mDb.query(NOTE_TABLE_TITLE,
-    			new String[] {NOTE_ROWID, NOTE_BODY, NOTE_LOCATION_ID},
-    			NOTE_BOOK_ID + "=" + bookId, null, null, null,
-    			null);
-    	return cursor;
     }
     
     /**
@@ -481,7 +591,6 @@ public class DBAdapter implements EvilBookTable {
     			null) > 0;
     	return isUpdated;
     }
-    /*************************************************************************/
 
 	public Cursor getTitlesPathsIdsOfEvilBooks() {
 		Cursor aCursorToTitlesPathsAndIds;
@@ -497,4 +606,6 @@ public class DBAdapter implements EvilBookTable {
     			null);
     	return aCursorToTitlesPathsAndIds;
 	}
+    /*************************************************************************/
+
 }
