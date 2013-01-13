@@ -66,7 +66,6 @@ public class LibraryActivity extends Activity {
 			this.titles.add(LibraryActivity.evilTriples.get(i).getEvilTitle());
 		}
 		if (this.titles.get(0).equalsIgnoreCase("NO EVIL BOOKS IN THE LIBRARY")) {
-			Log.e("EVILREADER", "NO EVIL BOOKS IN THE LIBRARY");
 			evilLibraryManager.refreshListOfEvilBooks();
 			LibraryActivity.evilTriples = this.getEvilTriples();
 			this.titles = new ArrayList<String>();
@@ -92,14 +91,12 @@ public class LibraryActivity extends Activity {
          switch (item.getItemId()) {
          case R.id.menu_import_book:
         	 // do something here because search button is pressed
-        	 //this.evilLibraryManager.saveBookmark();
         	 displayEvilMessage("Import an Evil Book!");
              return true;
          case R.id.menu_refresh_library:
         	 refreshGridView();
         	 return true;
          case R.id.menu_settings:
-        	 String notes = this.evilLibraryManager.getBookmarks();
         	 //displayEvilMessage(notes);
         	 displayEvilMessage("Menu settings");
          }
