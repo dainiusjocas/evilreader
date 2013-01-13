@@ -148,7 +148,7 @@ public class EvilLibraryManager {
 	 * 
 	 * @param mEvilBooks list of filenames (not absolute path) of epubs. 
 	 */
-	public void storeEvilBooks(ArrayList<String> mEvilBooks) {
+	private void storeEvilBooks(ArrayList<String> mEvilBooks) {
 		String title;
 		String authors;
 		String year;
@@ -178,7 +178,7 @@ public class EvilLibraryManager {
 	public void refreshListOfEvilBooks() {
 		ArrayList<String> evilFiles = getListOfFileNamesOfePubFiles();
 		storeEvilBooks(evilFiles);
-		//markEvilBooksThatAreNotPresent();
+		markEvilBooksThatAreNotPresent();
 	}
 	
 	/**
@@ -211,7 +211,7 @@ public class EvilLibraryManager {
 	 * 
 	 * @return aHashMap
 	 */
-	public HashMap<String, String> getTitleAndPathHashMap() {
+	private HashMap<String, String> getTitleAndPathHashMap() {
 		this._DBAdapter.open();
 		HashMap<String, String> aHashMap = new HashMap<String, String>();
 		Cursor aCursor = this._DBAdapter.getTitlesAndPathsOfEvilBooks();
