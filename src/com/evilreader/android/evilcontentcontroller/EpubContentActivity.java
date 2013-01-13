@@ -47,12 +47,12 @@ public class EpubContentActivity extends Activity {
 		// webViewPage1Settings.get
 		int fontSize = webViewPage1Settings.getDefaultFontSize();
 
-		EbookFileManager ebookFileManagerInstance = EbookFileManager
+		EbookContentManager ebookFileManagerInstance = EbookContentManager
 				.getInstance();
 		ebookFileManagerInstance.Init(getApplicationContext());
-		EbookFileManager.Height = height;
-		EbookFileManager.Width = width;
-		EbookFileManager.FontSize = fontSize;
+		EbookContentManager.Height = height;
+		EbookContentManager.Width = width;
+		EbookContentManager.FontSize = fontSize;
 
 		try {
 			ebookFileManagerInstance
@@ -68,7 +68,7 @@ public class EpubContentActivity extends Activity {
 			public void onClick(View v) {
 				currentChapterIndex++;
 
-				String chapterContent = EbookFileManager.getInstance()
+				String chapterContent = EbookContentManager.getInstance()
 						.GetNextPage();
 
 				if (chapterContent != null || chapterContent != "") {
@@ -89,7 +89,7 @@ public class EpubContentActivity extends Activity {
 				if (currentChapterIndex > 0) {
 					currentChapterIndex--;
 
-					String chapterContent = EbookFileManager.getInstance()
+					String chapterContent = EbookContentManager.getInstance()
 							.GetPreviousPage();
 
 					if (chapterContent != null || chapterContent != "") {

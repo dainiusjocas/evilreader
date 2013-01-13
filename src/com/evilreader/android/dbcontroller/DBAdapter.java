@@ -208,8 +208,14 @@ public class DBAdapter implements EvilBookTable {
 	 * @throws SQLException if DB cannot be neither opened nor created
 	 */
 	public DBAdapter open() throws SQLException {
-		mDbHelper = new DatabaseHelper(mContext);
-		mDb = mDbHelper.getWritableDatabase();
+		try {
+			mDbHelper = new DatabaseHelper(mContext);
+			mDb = mDbHelper.getWritableDatabase();
+		} catch (Exception e) {
+			int asd = 1;
+			// TODO: handle exception
+		}
+		
 		return this;
 	}
 	

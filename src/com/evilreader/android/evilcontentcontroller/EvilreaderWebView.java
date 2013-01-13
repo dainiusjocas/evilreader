@@ -501,7 +501,6 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		buttonTwo.setTitle("Add highlight");
 		buttonTwo.setActionId(2);
 		buttonTwo.setIcon(getResources().getDrawable(R.drawable.highlight));
-		
 		 
 		
 		
@@ -530,13 +529,8 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 					// Do Button 2 stuff
 					Log.i(TAG, "Hit Button 2");
 		        } 
-		        else if (actionId == 3) { 
-		        	// Do Button 3 stuff
-					Log.i(TAG, "Hit Button 3");
-		        }
-				
-				contextMenuVisible = false;
-					
+		        				
+				contextMenuVisible = false;					
 			}
 			
 		});
