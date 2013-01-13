@@ -1,5 +1,7 @@
 package com.evilreader.android.evilcontentcontroller;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -107,7 +109,22 @@ public class EbookFileManager {
 	// Method for loading the content from the pointed file
 	@SuppressWarnings("unused")
 	public void LoadEpubBookByAbsolutePath(String filePath) {
-		// TODO(Viktor): Implement
+		try {
+			// Obsolete
+			FileInputStream inputStream = new FileInputStream(new File(filePath));
+
+			Book currentEBook = inputStream != null ? (new EpubReader())
+					.readEpub(inputStream) : null;
+
+			if (currentEBook != null) {
+				this.InitiateEBookContent(currentEBook, -1);
+			} else {
+				return;
+			}
+
+		} catch (Exception e) {
+
+		}
 	}
 
 	// Method used for loading epub files from the Raw resources.

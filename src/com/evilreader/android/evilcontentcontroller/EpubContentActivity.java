@@ -36,8 +36,9 @@ public class EpubContentActivity extends Activity {
 
 		webviewPage1 = (EvilreaderWebView) findViewById(R.id.webView);
 		
-		/*String filePath = "file:///android_asset/content.html";
-		webviewPage1.loadUrl(filePath);*/
+		String filePath = getIntent().getExtras().getString("evil_path");
+		/*webviewPage1.loadUrl(filePath);*/
+		
 		
 		
 		int width = webviewPage1.getWidth();
@@ -55,7 +56,7 @@ public class EpubContentActivity extends Activity {
 
 		try {
 			ebookFileManagerInstance
-					.LoadEpubBookByRawResourceID(resourceIDSample);
+					.LoadEpubBookByAbsolutePath(filePath);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -104,6 +105,8 @@ public class EpubContentActivity extends Activity {
 		
 		webviewPage1.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + ebookFileManagerInstance.GetFirstPage() + "</body></html>",
 				"text/html", "UTF-8", "");
+		
+		
 	}
 	
 
