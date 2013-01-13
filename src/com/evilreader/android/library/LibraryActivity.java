@@ -22,6 +22,7 @@ public class LibraryActivity extends Activity {
 	private ArrayList<String> titles = new ArrayList<String>();
 	private static ArrayList<EvilTriple> evilTriples; //title, path, id
 	private EvilLibraryManager evilLibraryManager;
+	private GridView _GridView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,21 +31,17 @@ public class LibraryActivity extends Activity {
 		// Impossible to set fullscreen in layout xml file, so it is done here
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		this.evilLibraryManager = new EvilLibraryManager(this.getApplicationContext());
+		this.evilLibraryManager = 
+				new EvilLibraryManager(this.getApplicationContext());
 
-		getEvilBooks();
+		ArrayList<String> listOfTitles = getEvilBooks();
 		
-		GridView gridview = (GridView) findViewById(R.id.evil_library_gridview);
-		TextAdapter aTextAdapter = 
-				new TextAdapter(getApplicationContext(), this.titles);
-		gridview.setAdapter(aTextAdapter);
-		gridview.setOnItemClickListener(new OnItemClickListener() {
+		manageGridView(listOfTitles);
+//		
+		this._GridView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-				// according to position take element from the grid and call for another activity.
-				Log.e("EVILPAR", "pos: " + position);
-				Log.e("EVILPAR", "title" + LibraryActivity.evilTriples.get(position).getEvilTitle());
-				Log.e("EVILPAR", "path" + LibraryActivity.evilTriples.get(position).getEvilPath());
-				Log.e("EVILPAR", "id" + LibraryActivity.evilTriples.get(position).getEvilId());
+				// according to position in the GridView take element from the
+				// grid and call for another activity.
 				Bundle extras = new Bundle();
 				extras.putString("evil_title", LibraryActivity.evilTriples.get(position).getEvilTitle());
 				extras.putString("evil_path", LibraryActivity.evilTriples.get(position).getEvilPath());
@@ -62,13 +59,22 @@ public class LibraryActivity extends Activity {
 		return this.evilLibraryManager.getTitlePathId();
 	}
 	
-	private void getEvilBooks() { 
-		this.evilTriples = this.getEvilTriples();
+	private ArrayList<String> getEvilBooks() { 
+		LibraryActivity.evilTriples = this.getEvilTriples();
 		this.titles = new ArrayList<String>();
-		for (int i = 0; i < this.evilTriples.size(); i++) {
-			this.titles.add(this.evilTriples.get(i).getEvilTitle());
+		for (int i = 0; i < LibraryActivity.evilTriples.size(); i++) {
+			this.titles.add(LibraryActivity.evilTriples.get(i).getEvilTitle());
 		}
-		return;
+		if (this.titles.get(0).equalsIgnoreCase("NO EVIL BOOKS IN THE LIBRARY")) {
+			Log.e("EVILREADER", "NO EVIL BOOKS IN THE LIBRARY");
+			evilLibraryManager.refreshListOfEvilBooks();
+			LibraryActivity.evilTriples = this.getEvilTriples();
+			this.titles = new ArrayList<String>();
+			for (int i = 0; i < LibraryActivity.evilTriples.size(); i++) {
+				this.titles.add(LibraryActivity.evilTriples.get(i).getEvilTitle());
+			}
+		}
+		return this.titles;
 	}
 
 	@Override
@@ -86,13 +92,15 @@ public class LibraryActivity extends Activity {
          switch (item.getItemId()) {
          case R.id.menu_import_book:
         	 // do something here because search button is pressed
+        	 //this.evilLibraryManager.saveBookmark();
         	 displayEvilMessage("Import an Evil Book!");
              return true;
          case R.id.menu_refresh_library:
         	 refreshGridView();
         	 return true;
          case R.id.menu_settings:
-        	 // TODO(dainius)
+        	 String notes = this.evilLibraryManager.getBookmarks();
+        	 //displayEvilMessage(notes);
         	 displayEvilMessage("Menu settings");
          }
          return false;
@@ -102,22 +110,21 @@ public class LibraryActivity extends Activity {
 	 * Refreshes content that needs to be displayed, and refreshes the grid.
 	 */
 	private void refreshGridView() {
-		// getting new content ------------------------------------------------
-		ArrayList<String> refreshedContent;
 		evilLibraryManager.refreshListOfEvilBooks();
-		getEvilBooks();
-		refreshedContent = this.titles;
-		// refreshing the gridview---------------------------------------------
-		GridView gridview = (GridView) findViewById(R.id.evil_library_gridview);
-		gridview.invalidateViews();
-		gridview.invalidate();
-		TextAdapter aTextAdapter = 
-				new TextAdapter(getApplicationContext(), refreshedContent);
-		aTextAdapter.notifyDataSetChanged();
-		gridview.setAdapter(aTextAdapter);
-		gridview.setVisibility(View.VISIBLE);
-		// --------------------------------------------------------------------
+		ArrayList<String> refreshedContent = getEvilBooks();
+		manageGridView(refreshedContent);
 		return;
+	}
+	
+	private void manageGridView(ArrayList<String> pContent) {
+		this._GridView = (GridView) findViewById(R.id.evil_library_gridview);
+		this._GridView.invalidateViews();
+		this._GridView.invalidate();
+		TextAdapter aTextAdapter = 
+				new TextAdapter(getApplicationContext(), pContent);
+		aTextAdapter.notifyDataSetChanged();
+		this._GridView.setAdapter(aTextAdapter);
+		this._GridView.setVisibility(View.VISIBLE);
 	}
 	
 	/**
