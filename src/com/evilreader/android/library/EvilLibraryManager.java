@@ -230,27 +230,31 @@ public class EvilLibraryManager {
 		return aHashMap;
 	}
 	
-	public ArrayList<EvilTriple> getTitlePathId() {
+	public ArrayList<EvilQuadruple> getTitlePathId() {
 		this._DBAdapter.open();
-		ArrayList<EvilTriple> aTitlePathId = new ArrayList<EvilTriple>();
-		Cursor aCursor = this._DBAdapter.getTitlesPathsIdsOfEvilBooks();
+		ArrayList<EvilQuadruple> anAuthorTitlePathId = new ArrayList<EvilQuadruple>();
+		Cursor aCursor = this._DBAdapter.getAuthorsTitlesPathsIdsOfEvilBooks();
 		if (!aCursor.moveToFirst()) {
 			//Log.e("EVILREADER2", "NO EVIL BOOKS IN THE LIBRARY");
-			EvilTriple aTriple =  
-					new EvilTriple ("NO EVIL BOOKS IN THE LIBRARY",
-							"EVILREADER", "Evilreader");
+			EvilQuadruple aQuadruple =  
+					new EvilQuadruple ("EvilAuthor", "NO EVIL BOOKS IN THE LIBRARY",
+							"EvilPath", "EvilId");
 			aCursor.close();
 			this._DBAdapter.close();
-			aTitlePathId.add(aTriple);
-			return aTitlePathId;
+			anAuthorTitlePathId.add(aQuadruple);
+			return anAuthorTitlePathId;
 		}
 		do {
-			EvilTriple anEvilTriple = new EvilTriple(aCursor.getString(0), aCursor.getString(1), aCursor.getString(2));
-			aTitlePathId.add(anEvilTriple);
+			EvilQuadruple anEvilTriple = 
+					new EvilQuadruple(aCursor.getString(0).replace(",", ""), 
+							aCursor.getString(1), 
+							aCursor.getString(2), 
+							aCursor.getString(3));
+			anAuthorTitlePathId.add(anEvilTriple);
 		} while(aCursor.moveToNext());
 		aCursor.close();
 		this._DBAdapter.close();
-		return aTitlePathId;
+		return anAuthorTitlePathId;
 	}
 	
 	// getCoverImages

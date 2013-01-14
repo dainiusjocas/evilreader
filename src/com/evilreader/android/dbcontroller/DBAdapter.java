@@ -10,8 +10,6 @@
 
 package com.evilreader.android.dbcontroller;
 
-import com.evilreader.android.library.EvilTriple;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -594,9 +592,10 @@ public class DBAdapter implements EvilBookTable {
     	return isUpdated;
     }
 
-	public Cursor getTitlesPathsIdsOfEvilBooks() {
+	public Cursor getAuthorsTitlesPathsIdsOfEvilBooks() {
 		Cursor aCursorToTitlesPathsAndIds;
-    	String[] columns = {EVILBOOK_TITLE, EVILBOOK_ABSOLUTE_PATH, EVILBOOK_ID};
+    	String[] columns = {EVILBOOK_AUTHOR, EVILBOOK_TITLE,
+    			EVILBOOK_ABSOLUTE_PATH, EVILBOOK_ID};
     	String[] selectionArgs = {"true"};
     	aCursorToTitlesPathsAndIds = this.mDb.query(
     			EVILBOOK_TABLE_TITLE, 

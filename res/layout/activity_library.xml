@@ -10,12 +10,11 @@
         android:layout_height="fill_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:columnWidth="90dp"
+        android:columnWidth="100dp"
         android:gravity="center"
         android:horizontalSpacing="10dp"
-        android:numColumns="2"
         android:stretchMode="columnWidth"
-        android:verticalSpacing="10dp" >
+        android:verticalSpacing="1dp" >
     </GridView>
 
 </RelativeLayout>

@@ -22,7 +22,7 @@ import com.evilreader.android.R;
 public class LibraryActivity extends Activity {
 	
 	private ArrayList<String> titles = new ArrayList<String>();
-	private static ArrayList<EvilTriple> evilTriples; //title, path, id
+	private static ArrayList<EvilQuadruple> evilQuadruples; //title, path, id
 	private EvilLibraryManager evilLibraryManager;
 	private GridView _GridView;
 	private int whichItemIsSelected = -1;
@@ -47,9 +47,9 @@ public class LibraryActivity extends Activity {
 				// according to position in the GridView take element from the
 				// grid and call for another activity.
 				Bundle extras = new Bundle();
-				extras.putString("evil_title", LibraryActivity.evilTriples.get(position).getEvilTitle());
-				extras.putString("evil_path", LibraryActivity.evilTriples.get(position).getEvilPath());
-				extras.putString("evil_id", LibraryActivity.evilTriples.get(position).getEvilId());
+				extras.putString("evil_title", LibraryActivity.evilQuadruples.get(position).getEvilTitle());
+				extras.putString("evil_path", LibraryActivity.evilQuadruples.get(position).getEvilPath());
+				extras.putString("evil_id", LibraryActivity.evilQuadruples.get(position).getEvilId());
 				Intent aIntent = new Intent(LibraryActivity.this, 
 						com.evilreader.android.evilcontentcontroller.EpubContentActivity.class);
 	        	aIntent.putExtras(extras);
@@ -71,7 +71,7 @@ public class LibraryActivity extends Activity {
 	 * Scans database for information about ebooks available.
 	 * @return
 	 */
-	private ArrayList<EvilTriple> getEvilTriples() {
+	private ArrayList<EvilQuadruple> getEvilTriples() {
 		return this.evilLibraryManager.getTitlePathId();
 	}
 	
@@ -81,17 +81,23 @@ public class LibraryActivity extends Activity {
 	 * @return ArrayList<String> titles for grid view
 	 */
 	private ArrayList<String> getEvilBooks() { 
-		LibraryActivity.evilTriples = this.getEvilTriples();
+		LibraryActivity.evilQuadruples = this.getEvilTriples();
 		this.titles = new ArrayList<String>();
-		for (int i = 0; i < LibraryActivity.evilTriples.size(); i++) {
-			this.titles.add(LibraryActivity.evilTriples.get(i).getEvilTitle());
+		for (int i = 0; i < LibraryActivity.evilQuadruples.size(); i++) {
+			this.titles.add(
+					LibraryActivity.evilQuadruples.get(i).getEvilTitle()
+					+ "\nby " 
+					+ LibraryActivity.evilQuadruples.get(i).getEvilAuthor());
 		}
 		if (this.titles.get(0).equalsIgnoreCase("" + R.string.no_books)) {
 			evilLibraryManager.refreshListOfEvilBooks();
-			LibraryActivity.evilTriples = this.getEvilTriples();
+			LibraryActivity.evilQuadruples = this.getEvilTriples();
 			this.titles = new ArrayList<String>();
-			for (int i = 0; i < LibraryActivity.evilTriples.size(); i++) {
-				this.titles.add(LibraryActivity.evilTriples.get(i).getEvilTitle());
+			for (int i = 0; i < LibraryActivity.evilQuadruples.size(); i++) {
+				this.titles.add(
+						LibraryActivity.evilQuadruples.get(i).getEvilTitle()
+						+ "\nby " 
+						+ LibraryActivity.evilQuadruples.get(i).getEvilAuthor());
 			}
 		}
 		return this.titles;
@@ -170,7 +176,7 @@ public class LibraryActivity extends Activity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		EvilExporter anEvilExporter = new EvilExporter(this);
-		String aBookId = LibraryActivity.evilTriples.
+		String aBookId = LibraryActivity.evilQuadruples.
 				get(this.whichItemIsSelected).getEvilId();
 		switch (item.getItemId()) {
 		case R.id.export_notes:
