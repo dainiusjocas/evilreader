@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <item android:id="@+id/export_notes"
+          android:title="@string/export_notes" />
+    
+    <item android:id="@+id/export_highlights"
+          android:title="@string/export_highlights" />
+    
+    <item android:id="@+id/export_notes_and_highlights"
+        android:title="@string/export_notes_and_highlights" />
+    
+</menu>

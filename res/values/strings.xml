@@ -13,5 +13,10 @@
     <string name="title_activity_evil_library">EvilLibraryActivity</string>
     <string name="refresh_library">Refresh</string>
     <string name="import_book">Import a book</string>
+    <string name="export_notes">Export Notes</string>
+    <string name="export_highlights">Export Highlights</string>
+    <string name="export_notes_and_highlights">Export Notes and Highlights</string>
+    <string name="evil_context_menu">Evil Context Menu</string>
+    <string name="no_books">NO EVIL BOOKS IN THE LIBRARY</string>
 
 </resources>
