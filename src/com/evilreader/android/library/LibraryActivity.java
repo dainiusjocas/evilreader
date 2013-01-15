@@ -65,7 +65,6 @@ public class LibraryActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
-			displayEvilMessage("mooo");
 			switch(requestCode) {
 			case REQUEST_PICK_FILE:
 				if(data.hasExtra(FilePickerActivity.EXTRA_FILE_PATH)) {
@@ -74,9 +73,11 @@ public class LibraryActivity extends Activity {
 					this.evilLibraryManager.storeEvilBookInDatabase(aPath);
 					refreshGridView();
 				}
+				break;
 			default:
 				Log.e("test", data.getStringExtra(Intent.EXTRA_SUBJECT));
 				Log.e("test", data.getStringExtra(Intent.EXTRA_TEXT));
+				break;
 			}
 		}
 	}

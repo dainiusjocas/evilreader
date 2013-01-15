@@ -7,6 +7,7 @@ import com.evilreader.android.dbcontroller.DBAdapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Environment;
+import android.util.Log;
 
 /**
  * This class is responsible for managing the Evil ebooks Library.
