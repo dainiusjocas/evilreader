@@ -59,16 +59,8 @@ public class LibraryActivity extends Activity {
 	        	startActivity(aIntent);
         		return;	        	
 		}});
-		
-//		this._GridView.setOnItemLongClickListener(new OnItemLongClickListener() {
-//			public boolean onItemLongClick(AdapterView<?> parent, View v, int position,long id)
-//		    {
-//				displayEvilMessage("This is a LongClick" + position);
-//				return true;
-//		    }
-//		});
-		
 	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
@@ -77,17 +69,8 @@ public class LibraryActivity extends Activity {
 				if(data.hasExtra(FilePickerActivity.EXTRA_FILE_PATH)) {
 					// Get the file path
 					String aPath = data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH);
-					displayEvilMessage(aPath);
 					this.evilLibraryManager.storeEvilBookInDatabase(aPath);
 					refreshGridView();
-					
-					//this.evilLibraryManager.storeEvilBookInDatabase(aPath);
-					//displayEvilMessage(data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH));
-					
-					//File f = new File(data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH));
-
-					// Set the file path text view
-//					mFilePathTextView.setText(f.getPath());
 				}
 			}
 		}
@@ -143,14 +126,12 @@ public class LibraryActivity extends Activity {
         // Handle item selection
          switch (item.getItemId()) {
          case R.id.menu_import_book:
-        	 // do something here because search button is pressed
         	 Intent intent = new Intent(this, FilePickerActivity.class);
         	 // Only make .png files visible
  			 ArrayList<String> extensions = new ArrayList<String>();
  			 extensions.add(".epub");
  			 intent.putExtra(FilePickerActivity.EXTRA_ACCEPTED_FILE_EXTENSIONS, extensions);
         	 startActivityForResult(intent, REQUEST_PICK_FILE);
-        	 //displayEvilMessage("Import an Evil Book!");
              return true;
          case R.id.menu_refresh_library:
         	 refreshGridView();

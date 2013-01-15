@@ -212,8 +212,6 @@ public class EvilLibraryManager {
 		// two columns - [0] - absolute path, [1] - id
 		Cursor aCursor = this._DBAdapter.fetchAllEvilBooks();
 		if (!aCursor.moveToFirst()) {
-			//Log.e("EVILREADER ERROR", "NO EVIL BOOKS IN THE LIBRARY");
-			this.refreshListOfEvilBooks();
 			aCursor.close();
 			this._DBAdapter.close();
 			return;
