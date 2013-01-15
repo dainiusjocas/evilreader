@@ -154,7 +154,6 @@ public class EvilLibraryManager {
 		String filename;
 		String path;
 		EvilBook aEvilBook = new EvilBook(pEvilPath);
-		aEvilBook.getTitle();
 		authors = aEvilBook.getAuthors().trim();
 		title = aEvilBook.getTitle();
 		year = aEvilBook.getYear();
@@ -184,7 +183,6 @@ public class EvilLibraryManager {
 					+ "/" 
 					+ evilBook;
 			EvilBook aEvilBook = new EvilBook(anAbsolutePath);
-			aEvilBook.getTitle();
 			authors = aEvilBook.getAuthors().trim();
 			title = aEvilBook.getTitle();
 			year = aEvilBook.getYear();
