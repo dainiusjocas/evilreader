@@ -1,11 +1,11 @@
 package com.evilreader.android.library;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.evilreader.android.FilePickerActivity;
 import com.evilreader.android.R;
+import com.evilreader.android.dictionary.DictionaryChecker;
 
 public class LibraryActivity extends Activity {
 	
@@ -64,6 +65,7 @@ public class LibraryActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(resultCode == RESULT_OK) {
+			displayEvilMessage("mooo");
 			switch(requestCode) {
 			case REQUEST_PICK_FILE:
 				if(data.hasExtra(FilePickerActivity.EXTRA_FILE_PATH)) {
@@ -72,6 +74,9 @@ public class LibraryActivity extends Activity {
 					this.evilLibraryManager.storeEvilBookInDatabase(aPath);
 					refreshGridView();
 				}
+			default:
+				Log.e("test", data.getStringExtra(Intent.EXTRA_SUBJECT));
+				Log.e("test", data.getStringExtra(Intent.EXTRA_TEXT));
 			}
 		}
 	}
@@ -127,7 +132,7 @@ public class LibraryActivity extends Activity {
          switch (item.getItemId()) {
          case R.id.menu_import_book:
         	 Intent intent = new Intent(this, FilePickerActivity.class);
-        	 // Only make .png files visible
+        	 // Only make .epub files visible
  			 ArrayList<String> extensions = new ArrayList<String>();
  			 extensions.add(".epub");
  			 intent.putExtra(FilePickerActivity.EXTRA_ACCEPTED_FILE_EXTENSIONS, extensions);
@@ -137,8 +142,8 @@ public class LibraryActivity extends Activity {
         	 refreshGridView();
         	 return true;
          case R.id.menu_settings:
-        	 //displayEvilMessage(notes);
-        	 displayEvilMessage("Menu settings");
+        	 DictionaryChecker.translateWord("dog", this);
+        	 //displayEvilMessage("Menu settings");
          }
          return false;
 	}
