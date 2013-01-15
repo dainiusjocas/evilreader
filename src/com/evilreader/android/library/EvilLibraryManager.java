@@ -2,14 +2,11 @@ package com.evilreader.android.library;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.evilreader.android.dbcontroller.DBAdapter;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Environment;
-import android.util.Log;
 
 /**
  * This class is responsible for managing the Evil ebooks Library.
@@ -223,30 +220,6 @@ public class EvilLibraryManager {
 		} while(aCursor.moveToNext());
 		aCursor.close();
 		this._DBAdapter.close();
-	}
-	
-	/**
-	 * Constructs hash map for EvilBooks <Title, AbsolutePath>
-	 * 
-	 * @return aHashMap
-	 */
-	private HashMap<String, String> getTitleAndPathHashMap() {
-		this._DBAdapter.open();
-		HashMap<String, String> aHashMap = new HashMap<String, String>();
-		Cursor aCursor = this._DBAdapter.getTitlesAndPathsOfEvilBooks();
-		if (!aCursor.moveToFirst()) {
-			//Log.e("EVILREADER2", "NO EVIL BOOKS IN THE LIBRARY");
-			aHashMap.put("NO EVIL BOOKS IN THE LIBRARY", "EVILREADER");
-			aCursor.close();
-			this._DBAdapter.close();
-			return aHashMap;
-		}
-		do {
-			aHashMap.put(aCursor.getString(0), aCursor.getString(1));
-		} while(aCursor.moveToNext());
-		aCursor.close();
-		this._DBAdapter.close();
-		return aHashMap;
 	}
 	
 	public ArrayList<EvilQuadruple> getTitlePathId() {
