@@ -143,10 +143,33 @@ public class EvilLibraryManager {
 		return listOfFileNamesOfePubFiles;
 	}
 	
-	/*
+	/**
+	 * 
+	 * @param pEvilPath - full path!
+	 */
+	public void storeEvilBookInDatabase(String pEvilPath) {
+		String title;
+		String authors;
+		String year;
+		String filename;
+		String path;
+		EvilBook aEvilBook = new EvilBook(pEvilPath);
+		aEvilBook.getTitle();
+		authors = aEvilBook.getAuthors().trim();
+		title = aEvilBook.getTitle();
+		year = aEvilBook.getYear();
+		filename = "Dummy";
+		path = pEvilPath;
+		
+		this._DBAdapter.open();
+		this._DBAdapter.storeEvilBook(title, authors, year, filename, path);
+		this._DBAdapter.close();
+	}
+	
+	/**
 	 * Strores evil books in the database. 
 	 * 
-	 * @param mEvilBooks list of filenames (not absolute path) of epubs. 
+	 * @param mEvilBooks list of filenames (not absolute path!!) of epubs. 
 	 */
 	private void storeEvilBooks(ArrayList<String> mEvilBooks) {
 		String title;

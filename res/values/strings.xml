@@ -18,5 +18,6 @@
     <string name="export_notes_and_highlights">Export Notes and Highlights</string>
     <string name="evil_context_menu">Evil Context Menu</string>
     <string name="no_books">NO EVIL BOOKS IN THE LIBRARY</string>
+    <string name="title_activity_file_picker">FilePickerActivity</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package com.evilreader.android.library;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -17,6 +18,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.evilreader.android.FilePickerActivity;
 import com.evilreader.android.R;
 
 public class LibraryActivity extends Activity {
@@ -26,6 +28,7 @@ public class LibraryActivity extends Activity {
 	private EvilLibraryManager evilLibraryManager;
 	private GridView _GridView;
 	private int whichItemIsSelected = -1;
+	private static final int REQUEST_PICK_FILE = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,29 @@ public class LibraryActivity extends Activity {
 //		    }
 //		});
 		
+	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(resultCode == RESULT_OK) {
+			switch(requestCode) {
+			case REQUEST_PICK_FILE:
+				if(data.hasExtra(FilePickerActivity.EXTRA_FILE_PATH)) {
+					// Get the file path
+					String aPath = data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH);
+					displayEvilMessage(aPath);
+					this.evilLibraryManager.storeEvilBookInDatabase(aPath);
+					refreshGridView();
+					
+					//this.evilLibraryManager.storeEvilBookInDatabase(aPath);
+					//displayEvilMessage(data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH));
+					
+					//File f = new File(data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH));
+
+					// Set the file path text view
+//					mFilePathTextView.setText(f.getPath());
+				}
+			}
+		}
 	}
 	
 	/**
@@ -118,7 +144,13 @@ public class LibraryActivity extends Activity {
          switch (item.getItemId()) {
          case R.id.menu_import_book:
         	 // do something here because search button is pressed
-        	 displayEvilMessage("Import an Evil Book!");
+        	 Intent intent = new Intent(this, FilePickerActivity.class);
+        	 // Only make .png files visible
+ 			 ArrayList<String> extensions = new ArrayList<String>();
+ 			 extensions.add(".epub");
+ 			 intent.putExtra(FilePickerActivity.EXTRA_ACCEPTED_FILE_EXTENSIONS, extensions);
+        	 startActivityForResult(intent, REQUEST_PICK_FILE);
+        	 //displayEvilMessage("Import an Evil Book!");
              return true;
          case R.id.menu_refresh_library:
         	 refreshGridView();
