@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.evilreader.android;
+package com.evilreader.android.filePicker;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -24,6 +24,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.evilreader.android.R;
+import com.evilreader.android.R.drawable;
+import com.evilreader.android.R.id;
+import com.evilreader.android.R.layout;
 
 import android.app.ListActivity;
 import android.content.Context;
