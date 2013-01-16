@@ -12,6 +12,8 @@ import com.evilreader.android.dbcontroller.DBAdapter;
  *
  */
 public class GemManager {
+	
+	private static final GemManager INSTANCE = new GemManager();
 	// Context that we are executing
 	private Context _Context;
 	// Database controller
@@ -21,9 +23,17 @@ public class GemManager {
 	 * Contructor
 	 * @param pContext
 	 */
-	public GemManager(Context pContext) {
-		this._Context = pContext;
+	private GemManager() {
+		
+	}
+	
+	public void Init(Context contextWrapper) {
+		this._Context = contextWrapper;
 		this._DBAdapter = new DBAdapter(this._Context);
+	}
+
+	public static GemManager getInstance() {
+		return GemManager.INSTANCE;
 	}
 	
 	/**

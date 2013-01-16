@@ -72,6 +72,8 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 	protected boolean contextMenuVisible = false;
 	// The context menu.
 	private QuickAction mContextMenu;
+	//The currently loaded bookId into the view
+	private String currentBookId;
 	
 	private boolean mScrolling = false;
 	private float mScrollDiffY = 0;
@@ -109,7 +111,6 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 	}
 
 	protected void setup(Context context) {
-
 		try {
 			// On Touch Listener
 			this.setOnLongClickListener(this);
@@ -246,6 +247,9 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		return true;
 	}
 
+	public void SetCurrentBookId(String bookID){
+		this.currentBookId = bookID;
+	}
 	
 	/*=============================================
 	 * 
@@ -287,10 +291,14 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 			String saveEndString = String.format("javascript: android.selection.setEndPos(%f, %f);", endX, endY);
 			this.loadUrl(saveEndString);
 		}
+		
+		EvilreaderViewPager.enabled = true;
 	}
 	
 	public boolean startDrag(View v){
+		EvilreaderViewPager.enabled = false;
 	    Object dragInfo = v;
+	    mDragController.setWindowToken(v.getWindowToken());
 	    mDragController.startDrag (v, mSelectionDragLayer, dragInfo, DragController.DRAG_ACTION_MOVE);
 		return true;
 	}
@@ -393,7 +401,6 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 	// Ends selection mode on the UI thread
 	private Handler endSelectionModeHandler = new Handler(){
 			public void handleMessage(Message m){
-			
 				removeView(mSelectionDragLayer);
 				if(getParent() != null && mContextMenu != null && contextMenuVisible){
 					// This will throw an error if the webview is being redrawn.
@@ -517,17 +524,24 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		
 		//setup the action item click listener
 		mContextMenu.setOnActionItemClickListener(new QuickAction.OnActionItemClickListener() {
-		    
+			String asd = "";
 			public void onItemClick(QuickAction source, int pos,
 				int actionId) {
 				// TODO Auto-generated method stub
 				if (actionId == 1) { 
-					// Do Button 1 stuff
-					Log.i(TAG, "Hit Button 1");
+					GemManager.getInstance().saveBookmark(currentBookId,
+							EbookContentManager.getInstance().GetCurrentChapterNumber() + "",
+							EbookContentManager.getInstance().GetCurrentFirstParagraphNumber() + "");
+					
+					asd = GemManager.getInstance().getBookmarks(currentBookId);
 		        } 
 				else if (actionId == 2) { 
-					// Do Button 2 stuff
-					Log.i(TAG, "Hit Button 2");
+					GemManager.getInstance().saveHighlight(selectedText,
+							currentBookId,
+							EbookContentManager.getInstance().GetCurrentChapterNumber() + "",
+							EbookContentManager.getInstance().GetCurrentFirstParagraphNumber() + "");
+					
+					asd = GemManager.getInstance().getHighlights(currentBookId);
 		        } 
 		        				
 				contextMenuVisible = false;					

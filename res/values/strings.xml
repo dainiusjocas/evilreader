@@ -18,5 +18,9 @@
     <string name="export_notes_and_highlights">Export Notes and Highlights</string>
     <string name="evil_context_menu">Evil Context Menu</string>
     <string name="no_books">NO EVIL BOOKS IN THE LIBRARY</string>
+    <string name="title_section3">Section 3</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_activity_epub_content_activity2">EpubContentActivity2</string>
 
 </resources>

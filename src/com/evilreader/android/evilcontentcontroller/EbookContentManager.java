@@ -3,18 +3,30 @@ package com.evilreader.android.evilcontentcontroller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
+import com.evilreader.android.evilcontentcontroller.EpubContentActivity.EvilWebViewFragment;
+
 import nl.siegmann.epublib.domain.Book;
+import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.Spine;
 import nl.siegmann.epublib.domain.SpineReference;
+import nl.siegmann.epublib.domain.TOCReference;
+import nl.siegmann.epublib.domain.TableOfContents;
 import nl.siegmann.epublib.epub.EpubReader;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.view.ViewGroup.LayoutParams;
+import android.webkit.WebView;
+import android.webkit.WebViewFragment;
 
 /*
  * This class is responsible for loading the epub file into the memmory
@@ -25,18 +37,23 @@ import android.net.Uri;
 public class EbookContentManager {
 	// The singleton instance of this manager
 	private static final EbookContentManager INSTANCE = new EbookContentManager();
+	//private String javaScriptLibraries = "<html><head><script type='text/javascript' src='file:///android_asset/jquery.js'></script><script type='text/javascript' src='file:///android_asset/rangy-core.js'></script><script type='text/javascript' src='file:///android_asset/rangy-serializer.js'></script><script type='text/javascript' src='file:///android_asset/android.selection.js'></script></head><body>";
 	static int Width;
 	static int Height;
 	static int FontSize;
-	static int LettersPerPageConstraint = 700;
+	static int LettersPerPageConstraint = 600;
 	static int LinesPerPageConstraint;
 
 	private Context contextWrapper;
+	/*
+	 * A structure for mapping a single page to it's paragraphs and chapter
+	 * */
 	private HashMap<Integer, HashMap<Integer, ArrayList<String>>> currentEbookContentWithinChaptersAndPages;
 	// if the index is equal to -1 that means that there is no content in the
 	// EBookContent
 	private int currentPageNumberIndex;
 	private int currentChapterNumberIndex;
+	private List<EvilWebViewFragment> fragments;
 	private int lastPageNumberForTheCurrentBook = 0;
 
 	// private constructor for Singleton purpose
@@ -53,7 +70,7 @@ public class EbookContentManager {
 	
 	@SuppressLint("UseSparseArrays")
 	private void InitiateEBookContent(Book book, int progressPage, int progressChapter) {
-		currentEbookContentWithinChaptersAndPages = new HashMap<Integer, HashMap<Integer, ArrayList<String>>>();
+		//currentEbookContentWithinChaptersAndPages = new HashMap<Integer, HashMap<Integer, ArrayList<String>>>();
 		currentPageNumberIndex = progressPage;
 		currentChapterNumberIndex = progressChapter;
 		InputStream inputStream = null;
@@ -64,11 +81,11 @@ public class EbookContentManager {
 		try {
 			int currentPageNumber = 1;
 			int bufferLimiter = 0;
+			String bufferPage = "";
 			int chapterNumber = 1;
 			
-			for (SpineReference spineReference : book.getSpine()
-					.getSpineReferences()) {
-				currentEbookContentWithinChaptersAndPages.put(chapterNumber++, new HashMap<Integer, ArrayList<String>>());
+			for (SpineReference spineReference : book.getSpine().getSpineReferences()) {
+			//	currentEbookContentWithinChaptersAndPages.put(chapterNumber++, new HashMap<Integer, ArrayList<String>>());
 				inputStream = spineReference.getResource().getInputStream();
 				scanner = new Scanner(inputStream, "UTF-8")
 						.useDelimiter("</p>");
@@ -77,28 +94,50 @@ public class EbookContentManager {
 				 * this if is for when the number of characters is below 700 but there are
 				 * no more characters for the current chapter
 				 * */
+				
 				if(bufferLimiter != 0){
+					EvilreaderWebView webView = new EvilreaderWebView(contextWrapper);
+					LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
+					webView.setLayoutParams(lp);
+					//webView.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + bufferPage + "</body></html>", "text/html", "UTF-8", "");
+					EvilWebViewFragment fragment = new EvilWebViewFragment();
+					fragment.SetWebView(webView, bufferPage);
+					fragments.add(fragment);
+					
 					currentPageNumber++;
 					bufferLimiter = 0;
+					bufferPage = "";
 				}
 				
+				bufferPage = "";
 				while (scanner.hasNext()) {
 					String currentContent = scanner.next();
+					EvilreaderWebView webView = null;
 					
-					if(bufferLimiter == 0){
+					/*if(bufferLimiter == 0){
+						
 						currentEbookContentWithinChaptersAndPages.get(chapterNumber-1).put(currentPageNumber, new ArrayList<String>());
-					}
+					}*/
 					
 					bufferLimiter += currentContent.length();
+					bufferPage += currentContent;
 					
 					if(bufferLimiter < LettersPerPageConstraint){
-						currentEbookContentWithinChaptersAndPages.get(chapterNumber-1).get(currentPageNumber).add(currentContent);
-						
+						//currentEbookContentWithinChaptersAndPages.get(chapterNumber-1).get(currentPageNumber).add(currentContent);
 					}
 					
 					else if(bufferLimiter >= LettersPerPageConstraint){
-						currentEbookContentWithinChaptersAndPages.get(chapterNumber-1).get(currentPageNumber).add(currentContent);
+						LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
+						webView = new EvilreaderWebView(contextWrapper);
+						webView.setLayoutParams(lp);
+						//currentEbookContentWithinChaptersAndPages.get(chapterNumber-1).get(currentPageNumber).add(currentContent);
+						//webView.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + bufferPage + "</body></html>", "text/html", "UTF-8", "");						
+						EvilWebViewFragment fragment = new EvilWebViewFragment();
+						fragment.SetWebView(webView, bufferPage);
+						fragments.add(fragment);
+						
 						bufferLimiter = 0;
+						bufferPage = "";
 						currentPageNumber++;
 					}
 				}
@@ -133,18 +172,26 @@ public class EbookContentManager {
 
 	// Method for loading the content from the pointed file
 	@SuppressWarnings("unused")
-	public void LoadEpubBookByAbsolutePath(String filePath) {
+	public void LoadEpubBookByAbsolutePath(String filePath, List<EvilWebViewFragment> fragments) {
 		try {
 			// Obsolete
+			this.fragments = fragments;
 			FileInputStream inputStream = new FileInputStream(new File(filePath));
 
 			Book currentEBook = inputStream != null ? (new EpubReader())
 					.readEpub(inputStream) : null;
-
+					
+			/*TableOfContents table = currentEBook.getTableOfContents();
+			List<TOCReference> tocList = table.getTocReferences();
+			TOCReference toc = tocList.get(1);
+			Resource resource = toc.getResource();
+			Reader reader = resource.getReader();
+			reader.*/
+			
 			if (currentEBook != null) {
 				this.InitiateEBookContent(currentEBook, 1, 1);
 			} else {
-				return;
+				return; 
 			}
 
 		} catch (Exception e) {
