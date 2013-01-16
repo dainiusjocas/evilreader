@@ -12,6 +12,7 @@
         android:layout_alignParentTop="true"
         android:columnWidth="100dp"
         android:gravity="center"
+        android:numColumns="2"
         android:horizontalSpacing="10dp"
         android:stretchMode="columnWidth"
         android:verticalSpacing="1dp" >

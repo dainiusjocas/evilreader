@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -17,7 +18,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.evilreader.android.FilePickerActivity;
 import com.evilreader.android.R;
+import com.evilreader.android.dictionary.DictionaryChecker;
 
 public class LibraryActivity extends Activity {
 	
@@ -26,6 +29,7 @@ public class LibraryActivity extends Activity {
 	private EvilLibraryManager evilLibraryManager;
 	private GridView _GridView;
 	private int whichItemIsSelected = -1;
+	private static final int REQUEST_PICK_FILE = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +60,26 @@ public class LibraryActivity extends Activity {
 	        	startActivity(aIntent);
         		return;	        	
 		}});
-		
-//		this._GridView.setOnItemLongClickListener(new OnItemLongClickListener() {
-//			public boolean onItemLongClick(AdapterView<?> parent, View v, int position,long id)
-//		    {
-//				displayEvilMessage("This is a LongClick" + position);
-//				return true;
-//		    }
-//		});
-		
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(resultCode == RESULT_OK) {
+			switch(requestCode) {
+			case REQUEST_PICK_FILE:
+				if(data.hasExtra(FilePickerActivity.EXTRA_FILE_PATH)) {
+					// Get the file path
+					String aPath = data.getStringExtra(FilePickerActivity.EXTRA_FILE_PATH);
+					this.evilLibraryManager.storeEvilBookInDatabase(aPath);
+					refreshGridView();
+				}
+				break;
+			default:
+				Log.e("test", data.getStringExtra(Intent.EXTRA_SUBJECT));
+				Log.e("test", data.getStringExtra(Intent.EXTRA_TEXT));
+				break;
+			}
+		}
 	}
 	
 	/**
@@ -117,15 +132,19 @@ public class LibraryActivity extends Activity {
         // Handle item selection
          switch (item.getItemId()) {
          case R.id.menu_import_book:
-        	 // do something here because search button is pressed
-        	 displayEvilMessage("Import an Evil Book!");
+        	 Intent intent = new Intent(this, FilePickerActivity.class);
+        	 // Only make .epub files visible
+ 			 ArrayList<String> extensions = new ArrayList<String>();
+ 			 extensions.add(".epub");
+ 			 intent.putExtra(FilePickerActivity.EXTRA_ACCEPTED_FILE_EXTENSIONS, extensions);
+        	 startActivityForResult(intent, REQUEST_PICK_FILE);
              return true;
          case R.id.menu_refresh_library:
         	 refreshGridView();
         	 return true;
          case R.id.menu_settings:
-        	 //displayEvilMessage(notes);
-        	 displayEvilMessage("Menu settings");
+        	 DictionaryChecker.translateWord("dog", this);
+        	 //displayEvilMessage("Menu settings");
          }
          return false;
 	}

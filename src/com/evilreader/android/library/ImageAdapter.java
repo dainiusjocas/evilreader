@@ -1,6 +1,5 @@
 package com.evilreader.android.library;
 
-import com.evilreader.android.MainActivity;
 import com.evilreader.android.R;
 import android.content.Context;
 import android.content.Intent;

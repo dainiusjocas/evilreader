@@ -1,10 +1,16 @@
 package com.evilreader.android.evilcontentcontroller;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.evilreader.android.dbcontroller.DBAdapter;
+import com.evilreader.android.library.LibraryActivity;
 
 /**
  * This class is for saving bookmarks, highlights and and notes to the db.
@@ -34,6 +40,35 @@ public class GemManager {
 
 	public static GemManager getInstance() {
 		return GemManager.INSTANCE;
+	}
+	
+	public void makeNote(String pBookId, String pChapter, String pParagraph) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this._Context);
+
+   	 	alert.setTitle("Make a note");
+
+   	 	// Set an EditText view to get user input 
+   	 	final EditText input = new EditText(this._Context);
+   	 	alert.setView(input);
+   	 	
+   	 	final String aBookId = pBookId;
+   	 	final String aChapter = pChapter;
+   	 	final String aParagraph = pParagraph;
+
+   	 	alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+   	 		public void onClick(DialogInterface dialog, int whichButton) {
+   	 			CharSequence value = input.getText();
+   	 			storeNote(value.toString(), aBookId, aChapter, aParagraph);
+   	 		}
+   	 	});
+
+   	 	alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+   	 		public void onClick(DialogInterface dialog, int whichButton) {
+   	 			// Canceled.
+   	 		}
+   	 	});
+
+   	 	alert.show();
 	}
 	
 	/**

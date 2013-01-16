@@ -2,8 +2,6 @@ package com.evilreader.android.library;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.evilreader.android.dbcontroller.DBAdapter;
 
 import android.content.Context;
@@ -143,10 +141,32 @@ public class EvilLibraryManager {
 		return listOfFileNamesOfePubFiles;
 	}
 	
-	/*
+	/**
+	 * 
+	 * @param pEvilPath - full path!
+	 */
+	public void storeEvilBookInDatabase(String pEvilPath) {
+		String title;
+		String authors;
+		String year;
+		String filename;
+		String path;
+		EvilBook aEvilBook = new EvilBook(pEvilPath);
+		authors = aEvilBook.getAuthors().trim();
+		title = aEvilBook.getTitle();
+		year = aEvilBook.getYear();
+		filename = "Dummy";
+		path = pEvilPath;
+		
+		this._DBAdapter.open();
+		this._DBAdapter.storeEvilBook(title, authors, year, filename, path);
+		this._DBAdapter.close();
+	}
+	
+	/**
 	 * Strores evil books in the database. 
 	 * 
-	 * @param mEvilBooks list of filenames (not absolute path) of epubs. 
+	 * @param mEvilBooks list of filenames (not absolute path!!) of epubs. 
 	 */
 	private void storeEvilBooks(ArrayList<String> mEvilBooks) {
 		String title;
@@ -161,7 +181,6 @@ public class EvilLibraryManager {
 					+ "/" 
 					+ evilBook;
 			EvilBook aEvilBook = new EvilBook(anAbsolutePath);
-			aEvilBook.getTitle();
 			authors = aEvilBook.getAuthors().trim();
 			title = aEvilBook.getTitle();
 			year = aEvilBook.getYear();
@@ -189,8 +208,6 @@ public class EvilLibraryManager {
 		// two columns - [0] - absolute path, [1] - id
 		Cursor aCursor = this._DBAdapter.fetchAllEvilBooks();
 		if (!aCursor.moveToFirst()) {
-			//Log.e("EVILREADER ERROR", "NO EVIL BOOKS IN THE LIBRARY");
-			this.refreshListOfEvilBooks();
 			aCursor.close();
 			this._DBAdapter.close();
 			return;
@@ -204,30 +221,6 @@ public class EvilLibraryManager {
 		} while(aCursor.moveToNext());
 		aCursor.close();
 		this._DBAdapter.close();
-	}
-	
-	/**
-	 * Constructs hash map for EvilBooks <Title, AbsolutePath>
-	 * 
-	 * @return aHashMap
-	 */
-	private HashMap<String, String> getTitleAndPathHashMap() {
-		this._DBAdapter.open();
-		HashMap<String, String> aHashMap = new HashMap<String, String>();
-		Cursor aCursor = this._DBAdapter.getTitlesAndPathsOfEvilBooks();
-		if (!aCursor.moveToFirst()) {
-			//Log.e("EVILREADER2", "NO EVIL BOOKS IN THE LIBRARY");
-			aHashMap.put("NO EVIL BOOKS IN THE LIBRARY", "EVILREADER");
-			aCursor.close();
-			this._DBAdapter.close();
-			return aHashMap;
-		}
-		do {
-			aHashMap.put(aCursor.getString(0), aCursor.getString(1));
-		} while(aCursor.moveToNext());
-		aCursor.close();
-		this._DBAdapter.close();
-		return aHashMap;
 	}
 	
 	public ArrayList<EvilQuadruple> getTitlePathId() {
