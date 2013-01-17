@@ -55,6 +55,7 @@ public class EbookContentManager {
 	 * */
 	private HashMap<Integer, Pair<Integer, ArrayList<Integer>>> currentEbookContentWithinChaptersAndPages;
 	// EBookContent
+	private String currentBookId;
 	private int currentPageNumberIndex;
 	private int currentChapterNumberIndex;
 	private List<EvilWebViewFragment> fragments;
@@ -80,7 +81,8 @@ public class EbookContentManager {
 	 * @param progressChapter: used for Go To chapter functionality 
 	 * ToDo: implement progressPage and progressChapter logic;
 	 * */
-	private void InitiateEBookContent(Book book, int progressPage, int progressChapter) {
+	private void InitiateEBookContent(Book book, String bookId, int progressPage, int progressChapter) {
+		currentBookId = bookId;
 		currentEbookContentWithinChaptersAndPages = new HashMap<Integer, Pair<Integer, ArrayList<Integer>>>();
 		currentPageNumberIndex = progressPage;
 		currentChapterNumberIndex = progressChapter;
@@ -116,7 +118,7 @@ public class EbookContentManager {
 					 * */
 					
 					EvilWebViewFragment fragment = new EvilWebViewFragment();
-					fragment.SetWebView(this.contextWrapper, bufferPage);
+					fragment.SetWebView(this.contextWrapper, bufferPage, currentBookId);
 					fragments.add(fragment);
 					
 					currentEbookContentWithinChaptersAndPages.put(currentPageNumber, new Pair<Integer,ArrayList<Integer>>(chapterNumber, new ArrayList<Integer>(paragraphs)));
@@ -147,7 +149,7 @@ public class EbookContentManager {
 						 * */
 						
 						EvilWebViewFragment fragment = new EvilWebViewFragment();
-						fragment.SetWebView(this.contextWrapper, bufferPage);
+						fragment.SetWebView(this.contextWrapper, bufferPage,currentBookId);
 						fragments.add(fragment);
 						
 						currentEbookContentWithinChaptersAndPages.put(currentPageNumber, new Pair<Integer,ArrayList<Integer>>(chapterNumber, new ArrayList<Integer>(paragraphs)));
@@ -189,7 +191,7 @@ public class EbookContentManager {
 
 	// Method for loading the content from the pointed file
 	@SuppressWarnings("unused")
-	public void LoadEpubBookByAbsolutePath(String filePath, List<EvilWebViewFragment> fragments) {
+	public void LoadEpubBookByAbsolutePath(String filePath, String bookId, List<EvilWebViewFragment> fragments) {
 		try {
 			// Obsolete
 			this.fragments = fragments;
@@ -206,7 +208,7 @@ public class EbookContentManager {
 			reader.*/
 			
 			if (currentEBook != null) {
-				this.InitiateEBookContent(currentEBook, 1, 1);
+				this.InitiateEBookContent(currentEBook, bookId, 1, 1);
 			} else {
 				return; 
 			}
@@ -220,7 +222,7 @@ public class EbookContentManager {
 	// Used only for a testing purpose for the implemented functionality in this
 	// class ...
 	@SuppressLint("UseSparseArrays")
-	public void LoadEpubBookByRawResourceID(int resourceID) {
+	public void LoadEpubBookByRawResourceID(int resourceID, String bookId) {
 		try {
 			// Obsolete
 			InputStream inputStream = contextWrapper.getResources()
@@ -230,7 +232,7 @@ public class EbookContentManager {
 					.readEpub(inputStream) : null;
 
 			if (currentEBook != null) {
-				this.InitiateEBookContent(currentEBook, 1, 1);
+				this.InitiateEBookContent(currentEBook, bookId, 1, 1);
 			} else {
 				return;
 			}

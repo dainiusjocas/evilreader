@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.view.View.OnLongClickListener;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.Region;
@@ -111,6 +112,7 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		this.setup(context);
 	}
 
+	@SuppressLint("SetJavaScriptEnabled")
 	protected void setup(Context context) {
 		try {
 			// On Touch Listener
@@ -186,6 +188,8 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 	}
 
 	public boolean onTouch(View v, MotionEvent event) {
+		this.scrollTo(1, 1);
+		this.scrollTo(0, 0);
 		float xPoint = getDensityIndependentValue(event.getX(), ctx) / getDensityIndependentValue(this.getScale(), ctx);
 		float yPoint = getDensityIndependentValue(event.getY(), ctx) / getDensityIndependentValue(this.getScale(), ctx);
 		
@@ -410,7 +414,7 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 						mContextMenu.dismiss();
 					}
 					catch(Exception e){
-						
+						e.printStackTrace();
 					}
 				}
 				mSelectionBounds = null;

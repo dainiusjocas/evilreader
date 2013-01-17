@@ -63,7 +63,7 @@ public class EpubContentActivity extends FragmentActivity {
 		 */
 		
 		try {
-			EbookContentManager.getInstance().LoadEpubBookByAbsolutePath(filePath, fragments);
+			EbookContentManager.getInstance().LoadEpubBookByAbsolutePath(filePath, currentBookId, fragments);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -141,10 +141,12 @@ public class EpubContentActivity extends FragmentActivity {
 		private final String javaScriptLibraries = "<html><head><script type='text/javascript' src='file:///android_asset/jquery.js'></script><script type='text/javascript' src='file:///android_asset/rangy-core.js'></script><script type='text/javascript' src='file:///android_asset/rangy-serializer.js'></script><script type='text/javascript' src='file:///android_asset/android.selection.js'></script></head><body>";
 		EvilreaderWebView viewer = null;
 		String webViewContent = "";
+		String currentBookId;
 		Context mCtx;
 		
-		public void SetWebView(Context ctx,String content){
+		public void SetWebView(Context ctx,String content, String bookId){
 			webViewContent = content;
+			currentBookId = bookId;
 			mCtx = ctx;
 		}
 		
@@ -163,7 +165,8 @@ public class EpubContentActivity extends FragmentActivity {
 			viewer.setLayoutParams(lp);
 			viewer.setScrollBarStyle(WebView.OVER_SCROLL_ALWAYS);
 			viewer.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + webViewContent + "</body></html>", "text/html", "UTF-8", "");
-						
+			viewer.SetCurrentBookId(currentBookId);
+			
 			return viewer;
 		}
 		
