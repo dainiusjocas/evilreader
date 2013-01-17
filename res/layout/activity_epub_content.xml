@@ -5,7 +5,4 @@
     android:id="@+id/pager"
     android:background="#33b5e5"
     tools:context=".EpubContentActivity" >
-
-    
-
 </com.evilreader.android.evilcontentcontroller.EvilreaderViewPager>

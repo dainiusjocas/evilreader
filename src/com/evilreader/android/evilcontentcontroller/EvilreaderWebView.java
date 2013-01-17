@@ -5,6 +5,7 @@ import com.evilreader.android.blahti.drag.DragController.DragListener;
 import com.evilreader.android.blahti.drag.DragLayer;
 import com.evilreader.android.blahti.drag.DragSource;
 import com.evilreader.android.blahti.drag.MyAbsoluteLayout;
+import com.evilreader.android.dictionary.DictionaryChecker;
 import com.evilreader.android.londatiga.popupMenu.ActionItem;
 import com.evilreader.android.londatiga.popupMenu.QuickAction;
 import com.evilreader.android.londatiga.popupMenu.QuickAction.OnDismissListener;
@@ -490,9 +491,7 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		//if(displayRect.isEmpty()){
 		if(displayRect.right <= displayRect.left){
 			return;
-		}
-		
-		
+		}		
 		
 		//Copy action item
 		ActionItem buttonOne = new ActionItem();
@@ -508,18 +507,32 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		buttonTwo.setTitle("Add highlight");
 		buttonTwo.setActionId(2);
 		buttonTwo.setIcon(getResources().getDrawable(R.drawable.highlight));
-		 
 		
+		ActionItem buttonThree = new ActionItem();
+		 
+		buttonThree.setTitle("Add note");
+		buttonThree.setActionId(3);
+		buttonThree.setIcon(getResources().getDrawable(R.drawable.highlight));
+		
+		ActionItem buttonFour = new ActionItem();
+		 
+		buttonFour.setTitle("Dictionary");
+		buttonFour.setActionId(4);
+		buttonFour.setIcon(getResources().getDrawable(R.drawable.highlight));	
 		
 		// The action menu
 		mContextMenu  = new QuickAction(this.getContext());
 		mContextMenu.setOnDismissListener(this);
 		
 		// Add buttons
-		mContextMenu.addActionItem(buttonOne);
-		
+		mContextMenu.addActionItem(buttonOne);		
 		mContextMenu.addActionItem(buttonTwo);
+		mContextMenu.addActionItem(buttonThree);
 		
+		String[] words = this.selectedText.split(" ");
+		if(words.length == 1){
+			mContextMenu.addActionItem(buttonFour);
+		}
 		
 		
 		//setup the action item click listener
@@ -533,7 +546,7 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 							EbookContentManager.getInstance().GetCurrentChapterNumber() + "",
 							EbookContentManager.getInstance().GetCurrentFirstParagraphNumber() + "");
 					
-					asd = GemManager.getInstance().getBookmarks(currentBookId);
+					//asd = GemManager.getInstance().getBookmarks(currentBookId);
 		        } 
 				else if (actionId == 2) { 
 					GemManager.getInstance().saveHighlight(selectedText,
@@ -541,8 +554,19 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 							EbookContentManager.getInstance().GetCurrentChapterNumber() + "",
 							EbookContentManager.getInstance().GetCurrentFirstParagraphNumber() + "");
 					
-					asd = GemManager.getInstance().getHighlights(currentBookId);
-		        } 
+					//asd = GemManager.getInstance().getHighlights(currentBookId);
+		        }
+				else if (actionId == 3) { 
+					GemManager.getInstance().makeNote(currentBookId,
+							EbookContentManager.getInstance().GetCurrentChapterNumber() + "",
+							EbookContentManager.getInstance().GetCurrentFirstParagraphNumber() + "");
+					
+					//asd = GemManager.getInstance().getHighlights(currentBookId);
+		        }
+				
+				else if (actionId == 4) { 
+					DictionaryChecker.translateWord(selectedText, ctx);
+		        }
 		        				
 				contextMenuVisible = false;					
 			}

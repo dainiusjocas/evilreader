@@ -24,6 +24,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Pair;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
 import android.webkit.WebViewFragment;
@@ -37,7 +38,11 @@ import android.webkit.WebViewFragment;
 public class EbookContentManager {
 	// The singleton instance of this manager
 	private static final EbookContentManager INSTANCE = new EbookContentManager();
-	//private String javaScriptLibraries = "<html><head><script type='text/javascript' src='file:///android_asset/jquery.js'></script><script type='text/javascript' src='file:///android_asset/rangy-core.js'></script><script type='text/javascript' src='file:///android_asset/rangy-serializer.js'></script><script type='text/javascript' src='file:///android_asset/android.selection.js'></script></head><body>";
+	
+	/*
+	 * These fields are ment for the separation logic
+	 * Not implemented properly.
+	 * */
 	static int Width;
 	static int Height;
 	static int FontSize;
@@ -46,10 +51,9 @@ public class EbookContentManager {
 
 	private Context contextWrapper;
 	/*
-	 * A structure for mapping a single page to it's paragraphs and chapter
+	 * A structure for mapping a single page to it's paragraphs and chapters
 	 * */
-	private HashMap<Integer, HashMap<Integer, ArrayList<String>>> currentEbookContentWithinChaptersAndPages;
-	// if the index is equal to -1 that means that there is no content in the
+	private HashMap<Integer, Pair<Integer, ArrayList<Integer>>> currentEbookContentWithinChaptersAndPages;
 	// EBookContent
 	private int currentPageNumberIndex;
 	private int currentChapterNumberIndex;
@@ -64,31 +68,42 @@ public class EbookContentManager {
 	// provides logic for calculating how much letters the control,
 	// containing the content of the currently loaded book, should visualise without
 	// needing to show scroll control for the user.
+	// ToDo - this functionality is still not reaching a desired result
 	private void InitLettersPerPageCount() {
 		
 	}
 	
 	@SuppressLint("UseSparseArrays")
+	/*
+	 * Loading the book into the UI.
+	 * @param progressPage: used for Go To page functionality
+	 * @param progressChapter: used for Go To chapter functionality 
+	 * ToDo: implement progressPage and progressChapter logic;
+	 * */
 	private void InitiateEBookContent(Book book, int progressPage, int progressChapter) {
-		//currentEbookContentWithinChaptersAndPages = new HashMap<Integer, HashMap<Integer, ArrayList<String>>>();
+		currentEbookContentWithinChaptersAndPages = new HashMap<Integer, Pair<Integer, ArrayList<Integer>>>();
 		currentPageNumberIndex = progressPage;
 		currentChapterNumberIndex = progressChapter;
 		InputStream inputStream = null;
 		Scanner scanner = null;
-				
-		//Spine spine = null;
 		
 		try {
+			//Counters for mapping the currently loaded book with it's
+			//current state - page number, chapter number, paragraph number
 			int currentPageNumber = 1;
+			int currentParagraphNumber = 1;
+			int chapterNumber = 0;
+			List<Integer> paragraphs = new ArrayList<Integer>();
+			
 			int bufferLimiter = 0;
 			String bufferPage = "";
-			int chapterNumber = 1;
 			
-			for (SpineReference spineReference : book.getSpine().getSpineReferences()) {
-			//	currentEbookContentWithinChaptersAndPages.put(chapterNumber++, new HashMap<Integer, ArrayList<String>>());
+			
+			for (SpineReference spineReference : book.getSpine().getSpineReferences()) {				
 				inputStream = spineReference.getResource().getInputStream();
-				scanner = new Scanner(inputStream, "UTF-8")
-						.useDelimiter("</p>");
+				scanner = new Scanner(inputStream, "UTF-8").useDelimiter("</p>");
+				
+				chapterNumber++;
 				
 				/*
 				 * this if is for when the number of characters is below 700 but there are
@@ -96,15 +111,18 @@ public class EbookContentManager {
 				 * */
 				
 				if(bufferLimiter != 0){
-					EvilreaderWebView webView = new EvilreaderWebView(contextWrapper);
-					LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
-					webView.setLayoutParams(lp);
-					//webView.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + bufferPage + "</body></html>", "text/html", "UTF-8", "");
+					/*
+					 * Creating the view for the UI representing one page of the loaded book.
+					 * */
+					
 					EvilWebViewFragment fragment = new EvilWebViewFragment();
-					fragment.SetWebView(webView, bufferPage);
+					fragment.SetWebView(this.contextWrapper, bufferPage);
 					fragments.add(fragment);
 					
+					currentEbookContentWithinChaptersAndPages.put(currentPageNumber, new Pair<Integer,ArrayList<Integer>>(chapterNumber, new ArrayList<Integer>(paragraphs)));
+					
 					currentPageNumber++;
+					paragraphs = new ArrayList<Integer>();
 					bufferLimiter = 0;
 					bufferPage = "";
 				}
@@ -112,33 +130,32 @@ public class EbookContentManager {
 				bufferPage = "";
 				while (scanner.hasNext()) {
 					String currentContent = scanner.next();
-					EvilreaderWebView webView = null;
-					
-					/*if(bufferLimiter == 0){
-						
-						currentEbookContentWithinChaptersAndPages.get(chapterNumber-1).put(currentPageNumber, new ArrayList<String>());
-					}*/
 					
 					bufferLimiter += currentContent.length();
 					bufferPage += currentContent;
+					paragraphs.add(currentParagraphNumber);
+					currentParagraphNumber++;
 					
-					if(bufferLimiter < LettersPerPageConstraint){
-						//currentEbookContentWithinChaptersAndPages.get(chapterNumber-1).get(currentPageNumber).add(currentContent);
+					if(bufferLimiter < LettersPerPageConstraint/2){
+						
+						continue;
 					}
 					
 					else if(bufferLimiter >= LettersPerPageConstraint){
-						LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
-						webView = new EvilreaderWebView(contextWrapper);
-						webView.setLayoutParams(lp);
-						//currentEbookContentWithinChaptersAndPages.get(chapterNumber-1).get(currentPageNumber).add(currentContent);
-						//webView.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + bufferPage + "</body></html>", "text/html", "UTF-8", "");						
+						/*
+						 * Creating the view for the UI representing one page of the loaded book.
+						 * */
+						
 						EvilWebViewFragment fragment = new EvilWebViewFragment();
-						fragment.SetWebView(webView, bufferPage);
+						fragment.SetWebView(this.contextWrapper, bufferPage);
 						fragments.add(fragment);
+						
+						currentEbookContentWithinChaptersAndPages.put(currentPageNumber, new Pair<Integer,ArrayList<Integer>>(chapterNumber, new ArrayList<Integer>(paragraphs)));
 						
 						bufferLimiter = 0;
 						bufferPage = "";
 						currentPageNumber++;
+						paragraphs = new ArrayList<Integer>();
 					}
 				}
 			}
@@ -232,76 +249,61 @@ public class EbookContentManager {
 	}
 	
 	@SuppressWarnings("unused")
-	public String GetFirstPage() {
+	public String GetFirstPageContent() {
 		if (currentEbookContentWithinChaptersAndPages != null) {
 			
 			currentChapterNumberIndex = 1;
-			currentPageNumberIndex = 1;
+			currentPageNumberIndex = 1;			
 			
-			String buffer = "";
-			for(String paragraph:currentEbookContentWithinChaptersAndPages.get(currentChapterNumberIndex).get(currentPageNumberIndex)){
-				buffer += paragraph;
-			}
-			return buffer;
+			return this.fragments.get(currentPageNumberIndex).GetWebViewContent();
 		}
 
 		return "";
 	}
 
 	@SuppressWarnings("unused")
-	public String GetLastPage() {
+	public String GetLastPageContent() {
 		if (currentEbookContentWithinChaptersAndPages != null) {
 			
-			currentChapterNumberIndex = currentEbookContentWithinChaptersAndPages.size();
-			currentPageNumberIndex = lastPageNumberForTheCurrentBook;
+			currentPageNumberIndex = currentEbookContentWithinChaptersAndPages.size();
+			currentChapterNumberIndex = currentEbookContentWithinChaptersAndPages.get(currentPageNumberIndex).first;
 			
-			String buffer = "";
-			for(String paragraph:currentEbookContentWithinChaptersAndPages.get(currentChapterNumberIndex).get(currentPageNumberIndex)){
-				buffer += paragraph;
-			}
-			return buffer;
+			return this.fragments.get(currentPageNumberIndex).GetWebViewContent();
 		}
 
 		return "";
 	}
 
-	public String GetNextPage() {
-		
-		if(lastPageNumberForTheCurrentBook > currentPageNumberIndex){
-			currentPageNumberIndex++;
-		}
-		
-		if(!currentEbookContentWithinChaptersAndPages.get(currentChapterNumberIndex).containsKey(currentPageNumberIndex)){
-			currentChapterNumberIndex++;
-		}
-		
+	public String GetNextPageContent() {
 		if (currentEbookContentWithinChaptersAndPages != null) {
 			
-			String buffer = "";
-			for(String paragraph:currentEbookContentWithinChaptersAndPages.get(currentChapterNumberIndex).get(currentPageNumberIndex)){
-				buffer += paragraph;
+			if(currentEbookContentWithinChaptersAndPages.size() > currentPageNumberIndex){
+				currentPageNumberIndex++;
 			}
-			return buffer;
+			
+			if(currentEbookContentWithinChaptersAndPages.get(currentPageNumberIndex).first != currentPageNumberIndex){
+				currentChapterNumberIndex++;
+			}		
+		
+			
+			return this.fragments.get(currentPageNumberIndex).GetWebViewContent();
 		}
 
 		return "";
 	}
 
-	public String GetPreviousPage() {
-		if(currentPageNumberIndex > 1){
-			currentPageNumberIndex--;
-		}
-		if(!currentEbookContentWithinChaptersAndPages.get(currentChapterNumberIndex).containsKey(currentPageNumberIndex)){
-			currentChapterNumberIndex--;
-		}
-		
+	public String GetPreviousPageContent() {
 		if (currentEbookContentWithinChaptersAndPages != null) {
-			String buffer = "";
-			for(String paragraph:currentEbookContentWithinChaptersAndPages.get(currentChapterNumberIndex).get(currentPageNumberIndex)){
-				buffer += paragraph;
+			
+			if(currentPageNumberIndex > 1){
+				currentPageNumberIndex--;
 			}
 			
-			return buffer;
+			if(currentEbookContentWithinChaptersAndPages.get(currentPageNumberIndex).first != currentPageNumberIndex){
+				currentChapterNumberIndex--;
+			}
+			
+			return this.fragments.get(currentPageNumberIndex).GetWebViewContent();
 		}
 
 		return "";
@@ -313,42 +315,15 @@ public class EbookContentManager {
 	 * the indexes to the chapter and the number of this page are going
 	 * to be changed as well.
 	 * */
-	public String GetPageByNumber(Integer pageNumber){
-		int backupcurrentPageIndex = currentPageNumberIndex;
-		int backupcurrentChapterNumberIndex = currentChapterNumberIndex;
+	public String GetPageContentByPageNumber(Integer pageNumber){
 		
-		currentPageNumberIndex = pageNumber;
-		int findChapterIndexForPageNumber = 1;
-		try {
-			while(!currentEbookContentWithinChaptersAndPages.get(findChapterIndexForPageNumber).containsKey(currentPageNumberIndex)){
-				findChapterIndexForPageNumber++;
-			}
-		} catch (Exception e) {
-			/*
-			 * The page is not found
-			 * */
-			currentPageNumberIndex = backupcurrentPageIndex;
-			currentChapterNumberIndex = backupcurrentChapterNumberIndex;
-			return "";
-		}		
-		currentChapterNumberIndex = findChapterIndexForPageNumber;
-		
-		
-		if (currentEbookContentWithinChaptersAndPages != null
-				&& currentPageNumberIndex >= 1) {
-			String buffer = "";
-			for(String paragraph:currentEbookContentWithinChaptersAndPages.get(currentChapterNumberIndex).get(currentPageNumberIndex)){
-				buffer += paragraph;
-			}
+		if((pageNumber >= 1 || pageNumber <= currentEbookContentWithinChaptersAndPages.size()) && currentEbookContentWithinChaptersAndPages != null){
+			this.currentPageNumberIndex = pageNumber;
+			this.currentChapterNumberIndex = currentEbookContentWithinChaptersAndPages.get(currentPageNumberIndex).first;
 			
-			return buffer;
+			return this.fragments.get(currentPageNumberIndex).GetWebViewContent();
 		}
-
-		/*
-		 * The page is not found
-		 * */
-		currentPageNumberIndex = backupcurrentPageIndex;
-		currentChapterNumberIndex = backupcurrentChapterNumberIndex;
+		
 		return "";
 	}
 	
@@ -362,10 +337,7 @@ public class EbookContentManager {
 		if (currentEbookContentWithinChaptersAndPages != null
 				&& currentPageNumberIndex >= 0) {
 			String buffer = "";
-			for(String paragraph:currentEbookContentWithinChaptersAndPages.get(currentChapterNumberIndex).get(currentPageNumberIndex)){
-				buffer += paragraph;
-			}
-			
+						
 			return buffer;
 		}
 
@@ -380,23 +352,6 @@ public class EbookContentManager {
 	 * ToDo: Smoke test xP
 	 * */	
 	public int GetCurrentFirstParagraphNumber(){
-		int paragraphNumber = 1;
-		int currentPage = this.currentPageNumberIndex -1;
-		int currentChapter = this.currentChapterNumberIndex;
-		
-		try{
-		while(currentChapter > 0){
-			while(currentEbookContentWithinChaptersAndPages.get(currentChapter).containsKey(currentPage)){
-				paragraphNumber += currentEbookContentWithinChaptersAndPages.get(currentChapter).get(currentPage).size();
-				currentPage--;
-			}
-			currentChapter--;
-		}
-		}
-		catch(Exception ex){
-			return 0;
-		}
-		
-		return paragraphNumber;
+		return this.currentEbookContentWithinChaptersAndPages.get(currentPageNumberIndex).second.get(0);
 	}
 }

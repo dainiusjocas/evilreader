@@ -1,33 +1,23 @@
 package com.evilreader.android.evilcontentcontroller;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 import com.evilreader.android.R;
 
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewFragment;
-import android.widget.Button;
 
 public class EpubContentActivity extends FragmentActivity {
 	// private constants
@@ -81,14 +71,32 @@ public class EpubContentActivity extends FragmentActivity {
 		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
-		this.mSectionsPagerAdapter  = new PagerAdapter(super.getSupportFragmentManager(), fragments);
+		this.mSectionsPagerAdapter  = new PagerAdapter(this, fragments);
 		
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (EvilreaderViewPager) findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);		
+		mViewPager.setAdapter(mSectionsPagerAdapter);
+		mViewPager.setOnPageChangeListener(updateContentManager);		
 	}
 	
-
+	private OnPageChangeListener updateContentManager = new OnPageChangeListener() {
+		
+		public void onPageSelected(int arg0) {
+			EbookContentManager.getInstance().GetPageContentByPageNumber(arg0 + 1);
+			
+		}
+		
+		public void onPageScrolled(int arg0, float arg1, int arg2) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		public void onPageScrollStateChanged(int arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+	};
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.activity_epub_content, menu);
@@ -106,9 +114,10 @@ public class EpubContentActivity extends FragmentActivity {
 		 * @param fm
 		 * @param fragments
 		 */
-		public PagerAdapter(FragmentManager fm, List<EvilWebViewFragment> fragments) {
-			super(fm);
+		public PagerAdapter(FragmentActivity activity, List<EvilWebViewFragment> fragments) {
+			super(activity.getSupportFragmentManager());
 			this.fragments = fragments;
+			
 		}
 	
 		@Override
@@ -118,15 +127,9 @@ public class EpubContentActivity extends FragmentActivity {
 
 		@Override
 		public Fragment getItem(int arg0) {
-			EvilWebViewFragment fragment = fragments.get(arg0);
+			EvilWebViewFragment fragment = fragments.get(arg0);			
 			return fragment;
 		}
-		
-		@Override
-		public Parcelable saveState() {
-			// TODO Auto-generated method stub
-			return null;
-		}		
 	}
 	
 	public static class EvilWebViewFragment extends Fragment{
@@ -138,18 +141,36 @@ public class EpubContentActivity extends FragmentActivity {
 		private final String javaScriptLibraries = "<html><head><script type='text/javascript' src='file:///android_asset/jquery.js'></script><script type='text/javascript' src='file:///android_asset/rangy-core.js'></script><script type='text/javascript' src='file:///android_asset/rangy-serializer.js'></script><script type='text/javascript' src='file:///android_asset/android.selection.js'></script></head><body>";
 		EvilreaderWebView viewer = null;
 		String webViewContent = "";
+		Context mCtx;
 		
-		public void SetWebView(EvilreaderWebView webView, String content){
-			viewer = webView;
+		public void SetWebView(Context ctx,String content){
 			webViewContent = content;
+			mCtx = ctx;
 		}
+		
+		@Override  
+	    public void onCreate(Bundle savedInstanceState) {
+	        super.onCreate(savedInstanceState);
+	    }
 		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		        Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
+			
+			LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+			viewer = new EvilreaderWebView(mCtx);
+			viewer.setLayoutParams(lp);
+			viewer.setScrollBarStyle(WebView.OVER_SCROLL_ALWAYS);
 			viewer.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + webViewContent + "</body></html>", "text/html", "UTF-8", "");
-		    return viewer;
+						
+			return viewer;
 		}
+		
+		
+		
+		public String GetWebViewContent(){
+			return webViewContent;
+		}		
 	}
 }

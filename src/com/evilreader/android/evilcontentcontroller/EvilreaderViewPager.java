@@ -1,8 +1,10 @@
 package com.evilreader.android.evilcontentcontroller;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 public class EvilreaderViewPager extends ViewPager {
@@ -40,5 +42,4 @@ public class EvilreaderViewPager extends ViewPager {
 	public void setPagingEnabled(boolean enabled) {
 		EvilreaderViewPager.enabled = enabled;
 	}
-
 }
