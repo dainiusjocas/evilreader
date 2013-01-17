@@ -9,3 +9,4 @@ Since project team prefer to use online tools for documentation, you may find th
 * Current version of evilreader's use case diagram: https://docs.google.com/open?id=0B8roLQpn4PgCLVhSc082M2NPYlU
 * Current version of evilreader's app architecture in class diagram: https://docs.google.com/open?id=0B8roLQpn4PgCZmxremdmMmloX1U
 * Current DB schema: https://www.lucidchart.com/documents/edit/4292-c634-50a266cf-95a9-74190a56dde9
+* Project report: https://docs.google.com/document/d/1BIgLNztC2flBbQN2gWZtYrVR0agZ0uzLzS2RALcHoos/edit
