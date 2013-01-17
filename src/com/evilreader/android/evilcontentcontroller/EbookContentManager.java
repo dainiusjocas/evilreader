@@ -20,6 +20,7 @@ import nl.siegmann.epublib.domain.TableOfContents;
 import nl.siegmann.epublib.epub.EpubReader;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
@@ -49,6 +50,7 @@ public class EbookContentManager {
 	static int LettersPerPageConstraint = 600;
 	static int LinesPerPageConstraint;
 
+	private Activity activity;
 	private Context contextWrapper;
 	/*
 	 * A structure for mapping a single page to it's paragraphs and chapters
@@ -118,7 +120,7 @@ public class EbookContentManager {
 					 * */
 					
 					EvilWebViewFragment fragment = new EvilWebViewFragment();
-					fragment.SetWebView(this.contextWrapper, bufferPage, currentBookId);
+					fragment.SetWebView(this.contextWrapper, bufferPage, currentBookId,activity);
 					fragments.add(fragment);
 					
 					currentEbookContentWithinChaptersAndPages.put(currentPageNumber, new Pair<Integer,ArrayList<Integer>>(chapterNumber, new ArrayList<Integer>(paragraphs)));
@@ -149,7 +151,7 @@ public class EbookContentManager {
 						 * */
 						
 						EvilWebViewFragment fragment = new EvilWebViewFragment();
-						fragment.SetWebView(this.contextWrapper, bufferPage,currentBookId);
+						fragment.SetWebView(this.contextWrapper, bufferPage,currentBookId, activity);
 						fragments.add(fragment);
 						
 						currentEbookContentWithinChaptersAndPages.put(currentPageNumber, new Pair<Integer,ArrayList<Integer>>(chapterNumber, new ArrayList<Integer>(paragraphs)));
@@ -178,8 +180,9 @@ public class EbookContentManager {
 	// The contextWrapper as a reference is needed to have access to the local
 	// storage of the Application,
 	// so this class needs this data
-	public void Init(Context ContextWrapper) {
-		contextWrapper = ContextWrapper;
+	public void Init(Context ContextWrapper, Activity currentActivity) {
+		this.contextWrapper = ContextWrapper;
+		this.activity = currentActivity;
 	}
 
 	// Method for downloading new epub books to the local resource storage of

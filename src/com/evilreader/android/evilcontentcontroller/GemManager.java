@@ -1,5 +1,6 @@
 package com.evilreader.android.evilcontentcontroller;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,9 +15,9 @@ import com.evilreader.android.dbcontroller.DBAdapter;
  */
 public class GemManager {
 	
-	private static final GemManager INSTANCE = new GemManager();
 	// Context that we are executing
 	private Context _Context;
+	private Activity activity;
 	// Database controller
 	private DBAdapter _DBAdapter;
 	
@@ -24,26 +25,19 @@ public class GemManager {
 	 * Contructor
 	 * @param pContext
 	 */
-	private GemManager() {
-		
-	}
-	
-	public void Init(Context contextWrapper) {
+	public GemManager(Context contextWrapper, Activity currentActivity) {
+		this.activity = currentActivity;
 		this._Context = contextWrapper;
 		this._DBAdapter = new DBAdapter(this._Context);
 	}
-
-	public static GemManager getInstance() {
-		return GemManager.INSTANCE;
-	}
 	
 	public void makeNote(String pBookId, String pChapter, String pParagraph) {
-		AlertDialog.Builder alert = new AlertDialog.Builder(this._Context);
+		AlertDialog.Builder alert = new AlertDialog.Builder(activity);
 
    	 	alert.setTitle("Make a note");
 
    	 	// Set an EditText view to get user input 
-   	 	final EditText input = new EditText(this._Context);
+   	 	final EditText input = new EditText(activity);
    	 	alert.setView(input);
    	 	
    	 	final String aBookId = pBookId;

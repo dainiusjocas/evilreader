@@ -6,6 +6,7 @@ import java.util.Vector;
 import com.evilreader.android.R;
 
 import android.os.Bundle;
+import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -55,8 +56,8 @@ public class EpubContentActivity extends FragmentActivity {
 		/*
 		 * Initiating managers
 		 * */
-		GemManager.getInstance().Init(getApplicationContext());
-		EbookContentManager.getInstance().Init(getApplicationContext());
+		//GemManager.getInstance().Init(getApplicationContext());
+		EbookContentManager.getInstance().Init(getApplicationContext(),this);
 		
 		/*
 		 * Loading the book and creating all the views and add them to the page viewer
@@ -143,11 +144,13 @@ public class EpubContentActivity extends FragmentActivity {
 		String webViewContent = "";
 		String currentBookId;
 		Context mCtx;
+		Activity activity;
 		
-		public void SetWebView(Context ctx,String content, String bookId){
-			webViewContent = content;
-			currentBookId = bookId;
-			mCtx = ctx;
+		public void SetWebView(Context ctx,String content, String bookId, Activity currentActivity){
+			this.webViewContent = content;
+			this.currentBookId = bookId;
+			this.mCtx = ctx;
+			this.activity = currentActivity;
 		}
 		
 		@Override  
@@ -161,7 +164,7 @@ public class EpubContentActivity extends FragmentActivity {
 			super.onCreate(savedInstanceState);
 			
 			LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
-			viewer = new EvilreaderWebView(mCtx);
+			viewer = new EvilreaderWebView(mCtx, activity);
 			viewer.setLayoutParams(lp);
 			viewer.setScrollBarStyle(WebView.OVER_SCROLL_ALWAYS);
 			viewer.loadDataWithBaseURL("file:///android_asset/",javaScriptLibraries + webViewContent + "</body></html>", "text/html", "UTF-8", "");

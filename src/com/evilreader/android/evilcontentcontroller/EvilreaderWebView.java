@@ -23,6 +23,7 @@ import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.view.View.OnLongClickListener;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.Region;
@@ -76,6 +77,8 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 	private QuickAction mContextMenu;
 	//The currently loaded bookId into the view
 	private String currentBookId;
+	//Manager for storing data
+	private GemManager gemManager;
 	
 	private boolean mScrolling = false;
 	private float mScrollDiffY = 0;
@@ -93,25 +96,36 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 	 * 
 	 * ==========================================*/
 
-	public EvilreaderWebView(Context context) {
+	public EvilreaderWebView(Context context, Activity currentActivity) {
 		super(context);
 
 		this.ctx = context;
 		this.setup(context);
+		this.gemManager = new GemManager(context, currentActivity);
 	}
 
+	/*
+	 * If you call these constructor making notes is not going to work
+	 * It needs the current activity;
+	 * */
 	public EvilreaderWebView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 
 		this.ctx = context;
 		this.setup(context);
+		this.gemManager = new GemManager(context, null);
 	}
 
+	/*
+	 * If you call these constructors making notes is not going to work
+	 * * It needs the current activity;
+	 * */
 	public EvilreaderWebView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 
 		this.ctx = context;
 		this.setup(context);
+		this.gemManager = new GemManager(context, null);
 	}
 
 	@SuppressLint("SetJavaScriptEnabled")
@@ -552,14 +566,14 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 				int actionId) {
 				// TODO Auto-generated method stub
 				if (actionId == 1) { 
-					GemManager.getInstance().saveBookmark(currentBookId,
+					gemManager.saveBookmark(currentBookId,
 							EbookContentManager.getInstance().GetCurrentChapterNumber() + "",
 							EbookContentManager.getInstance().GetCurrentFirstParagraphNumber() + "");
 					
 					//asd = GemManager.getInstance().getBookmarks(currentBookId);
 		        } 
 				else if (actionId == 2) { 
-					GemManager.getInstance().saveHighlight(selectedText,
+					gemManager.saveHighlight(selectedText,
 							currentBookId,
 							EbookContentManager.getInstance().GetCurrentChapterNumber() + "",
 							EbookContentManager.getInstance().GetCurrentFirstParagraphNumber() + "");
@@ -567,7 +581,7 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 					//asd = GemManager.getInstance().getHighlights(currentBookId);
 		        }
 				else if (actionId == 3) { 
-					GemManager.getInstance().makeNote(currentBookId,
+					gemManager.makeNote(currentBookId,
 							EbookContentManager.getInstance().GetCurrentChapterNumber() + "",
 							EbookContentManager.getInstance().GetCurrentFirstParagraphNumber() + "");
 					
