@@ -10,6 +10,8 @@
 
 package com.evilreader.android.dbcontroller;
 
+import java.util.ArrayList;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -24,12 +26,12 @@ import android.util.Log;
  * @author Dainius Jocas
  *
  */
-public class DBAdapter implements EvilBookTable {
+public class DBAdapter {
 	/**************************************************************************
 	 * Names and definitions for the EvilReader DB
 	 *************************************************************************/
 	public static final String DATABASE_NAME = "evilreaderdb";
-	public static final int DATABASE_VERSION = 7;
+	public static final int DATABASE_VERSION = 9;
 	
 	/**************************************************************************
 	 * DEFINITIONS FOR NOTE TABLE
@@ -150,6 +152,7 @@ public class DBAdapter implements EvilBookTable {
 	private static final String EVILBOOK_TITLE = "title";
 	private static final String EVILBOOK_AUTHOR = "author";
 	private static final String EVILBOOK_YEAR = "year";
+	private static final String EVILBOOK_CHAPTERS = "chapters";
 	private static final String EVILBOOK_FILENAME = "filename";
 	private static final String EVILBOOK_ABSOLUTE_PATH = "absolute_path";
 	private static final String EVILBOOK_IS_PRESENT = "is_present";
@@ -169,6 +172,8 @@ public class DBAdapter implements EvilBookTable {
 	        + EVILBOOK_AUTHOR 
 	        + " text, "
 	        + EVILBOOK_YEAR
+	        + " text, "
+	        + EVILBOOK_CHAPTERS
 	        + " text, "
 	        + EVILBOOK_IS_PRESENT 
 	        + " text, "
@@ -285,6 +290,87 @@ public class DBAdapter implements EvilBookTable {
     			selectionArgs,
     			null, null, null);
     	return cursor;
+    }
+    
+    public int getNumberOfBookmarks(String pBookId) {
+    	int numberOfBookmarks = 0;
+    	this.open();
+    	Cursor aCursor = fetchBookmarks(pBookId);
+    	if (!aCursor.moveToFirst()) {
+    		aCursor.close();
+        	this.close();
+    		return 0;
+    	}
+    	do {
+    		numberOfBookmarks = numberOfBookmarks + 1;
+    	} while (aCursor.moveToNext());
+    	aCursor.close();
+    	this.close();
+    	return 0;
+    }
+    
+    /**
+     * Gets bookmark's location in the book. Location is described by array of
+     * ints where:
+     *  - location[0] is chapter number
+     *  - location[1] is paragraph number 
+     * If there is no such bookmark then {-1, -1} is returned.
+     * @param pBookmarkRowId
+     * @return
+     */
+    public int[] getLocationByBookmarkRowId(String pBookmarkRowId) {
+    	int[] location = new int[2];
+    	String[] columns = {BOOKMARK_CHAPTER, BOOKMARK_PARAGRAPH};
+    	String[] selectionArgs = {pBookmarkRowId};
+    	this.open();
+    	Cursor aCursor = mDb.query(
+    			BOOKMARK_TABLE_TITLE, 
+    			columns, 
+    			BOOKMARK_ROWID + " = ? ",
+    			selectionArgs, 
+    			null, 
+    			null, 
+    			null);
+    	if (!aCursor.moveToFirst()) {
+    		location[0] = -1;
+    		location[1] = -1;
+    		aCursor.close();
+    		return location;
+    	}
+    	location[0] = Integer.parseInt(aCursor.getString(0));
+    	location[1] = Integer.parseInt(aCursor.getString(1));
+    	aCursor.close();
+    	this.close();
+    	return location;
+    }
+    
+    /**
+     * Makes an ArrayList of all the bookmarks for the specified book. 
+     * If there are no bookmarks then null is returned!!!
+     * @param pBookId
+     * @return
+     */
+    public ArrayList<String> getAllBookmarkIdsByBookID(String pBookId) {
+    	ArrayList<String> bookmarkIds = new ArrayList();
+    	String[] columns = {BOOKMARK_ROWID};
+    	String[] selectionArgs = {pBookId};
+    	this.open();
+    	Cursor aCursor = mDb.query(
+    			BOOKMARK_TABLE_TITLE, 
+    			columns,
+    			BOOKMARK_BOOK_ID + " = ? ",
+    			selectionArgs,
+    			null, null, null);
+    	if (!aCursor.moveToFirst()) {
+    		aCursor.close();
+    		this.close();
+    		return null;
+    	}
+    	do {
+    		 bookmarkIds.add(aCursor.getString(0));
+    	} while (aCursor.moveToNext());
+    	this.close();
+    	return bookmarkIds;
     }
     /*************************************************************************/
     
@@ -452,8 +538,8 @@ public class DBAdapter implements EvilBookTable {
      * @param pAbsolutePath
      * @return rowid if success or -1 if failed to store
      */
-    public long storeEvilBook(String pTitle, String pAuthor, String pYear,
-    		String pFilename, String pAbsolutePath) {
+    public long storeEvilBook(String pTitle, String pAuthor, String pYear, 
+    		String pChapters, String pFilename, String pAbsolutePath) {
     	long rowid;
     	ContentValues values = new ContentValues();
     	String anEvilBookId = 
@@ -462,6 +548,7 @@ public class DBAdapter implements EvilBookTable {
     	values.put(EVILBOOK_TITLE, pTitle);
     	values.put(EVILBOOK_AUTHOR, pAuthor);
     	values.put(EVILBOOK_YEAR, pYear);
+    	values.put(EVILBOOK_CHAPTERS, pChapters);
     	values.put(EVILBOOK_IS_PRESENT, "true");
     	values.put(EVILBOOK_FILENAME, pFilename);
     	values.put(EVILBOOK_ABSOLUTE_PATH, pAbsolutePath);
@@ -660,7 +747,7 @@ public class DBAdapter implements EvilBookTable {
 		return aTitle;
 	}
 		
-		public String getEvilBookYear(String pBookId) {
+	public String getEvilBookYear(String pBookId) {
 			this.open();
 			String aYear = "";
 			Cursor aCursorToYear;
@@ -685,6 +772,32 @@ public class DBAdapter implements EvilBookTable {
 			this.close();
 			return aYear;
 	}
+	
+	public int getNumberOfEvilBookChapters(String pBookId) {
+		this.open();
+		String aNumberOfChapters = "";
+		Cursor aCursorToNumberOfChapter;
+		String[] column = {EVILBOOK_CHAPTERS};
+		String[] selectionArgs = {pBookId};
+		aCursorToNumberOfChapter = this.mDb.query(
+    			EVILBOOK_TABLE_TITLE, 
+    			column, 
+    			EVILBOOK_ID + " = ?", 
+    			selectionArgs, 
+    			null, 
+    			null, 
+    			null);
+		if (!aCursorToNumberOfChapter.moveToFirst()) {
+			aCursorToNumberOfChapter.close();
+			this.close();
+			return 0;
+		}
+		aNumberOfChapters = aCursorToNumberOfChapter.getString(0);
+		aCursorToNumberOfChapter.close();
+		this.close();
+		
+		return Integer.parseInt(aNumberOfChapters);
+}
     /*************************************************************************/
 
 }
