@@ -84,6 +84,8 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 	private float mLastTouchX = 0;
 	private TextSelectionJavascriptInterface textSelectionJSInterface = null;
 	
+	private boolean scrolled = false;
+	
 	/*=============================================
 	 * 
 	 * The constructors and the setups
@@ -184,12 +186,16 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 
 		this.mStartSelectionHandle.setOnTouchListener(handleTouchListener);
 		this.mEndSelectionHandle.setOnTouchListener(handleTouchListener);
-
 	}
 
 	public boolean onTouch(View v, MotionEvent event) {
-		this.scrollTo(1, 1);
-		this.scrollTo(0, 0);
+		if(!scrolled){
+			this.scrollTo(1, 1);
+			this.scrollTo(0, 0);
+			
+			scrolled = true;
+		}
+		
 		float xPoint = getDensityIndependentValue(event.getX(), ctx) / getDensityIndependentValue(this.getScale(), ctx);
 		float yPoint = getDensityIndependentValue(event.getY(), ctx) / getDensityIndependentValue(this.getScale(), ctx);
 		
