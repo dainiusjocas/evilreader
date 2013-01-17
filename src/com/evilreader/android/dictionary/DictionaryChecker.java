@@ -43,7 +43,7 @@ public class DictionaryChecker {
    	 	anDictIntent.putExtra(EXTRA_MARGIN_LEFT, 100);
    	 	if (!isIntentAvailable(pContext, anDictIntent)) {
    	 		Toast.makeText(pContext,
-				"No such package. Install color dict.",
+				"Install ColorDict.",
 				Toast.LENGTH_LONG).show();
    	 	} else {
    	 	((Activity) pContext).startActivityForResult(anDictIntent,

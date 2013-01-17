@@ -18,9 +18,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.evilreader.android.FilePickerActivity;
 import com.evilreader.android.R;
-import com.evilreader.android.dictionary.DictionaryChecker;
+import com.evilreader.android.filePicker.FilePickerActivity;
+import com.evilreader.android.tableOfContents.ToCActivity;
 
 public class LibraryActivity extends Activity {
 	
@@ -74,9 +74,19 @@ public class LibraryActivity extends Activity {
 					refreshGridView();
 				}
 				break;
+			case 2:
+				if(data.hasExtra("chapter")) {	
+					String result = data.getStringExtra("chapter");
+					displayEvilMessage("chapter:  " + result);
+				}
+				if(data.hasExtra("bookmark")) {	
+					String result = data.getStringExtra("chapter");
+					displayEvilMessage("bookmark:  " + result);
+				}
+				break;
 			default:
-				Log.e("test", data.getStringExtra(Intent.EXTRA_SUBJECT));
-				Log.e("test", data.getStringExtra(Intent.EXTRA_TEXT));
+				//Log.e("test", data.getStringExtra("chapter"));
+				//displayEvilMessage("MOO" + data.getStringExtra("chapter"));
 				break;
 			}
 		}
@@ -104,7 +114,7 @@ public class LibraryActivity extends Activity {
 					+ "\nby " 
 					+ LibraryActivity.evilQuadruples.get(i).getEvilAuthor());
 		}
-		if (this.titles.get(0).equalsIgnoreCase("" + R.string.no_books)) {
+		if (this.titles.get(0).equalsIgnoreCase("NO EVIL BOOKS IN THE LIBRARY\nby EvilAuthor")) {
 			evilLibraryManager.refreshListOfEvilBooks();
 			LibraryActivity.evilQuadruples = this.getEvilTriples();
 			this.titles = new ArrayList<String>();
@@ -143,7 +153,12 @@ public class LibraryActivity extends Activity {
         	 refreshGridView();
         	 return true;
          case R.id.menu_settings:
-        	 DictionaryChecker.translateWord("dog", this);
+        	 //DictionaryChecker.translateWord("dog", this);
+        	 Intent aIntent = new Intent(this, ToCActivity.class);
+        	 Bundle extras = new Bundle();
+        	 extras.putString("evil_id", LibraryActivity.evilQuadruples.get(0).getEvilId());
+        	 aIntent.putExtras(extras);
+        	 startActivityForResult(aIntent, 2);
         	 //displayEvilMessage("Menu settings");
          }
          return false;

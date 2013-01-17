@@ -1,16 +1,11 @@
 package com.evilreader.android.evilcontentcontroller;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.util.Log;
 import android.widget.EditText;
-import android.widget.Toast;
-
 import com.evilreader.android.dbcontroller.DBAdapter;
-import com.evilreader.android.library.LibraryActivity;
 
 /**
  * This class is for saving bookmarks, highlights and and notes to the db.

@@ -9,6 +9,7 @@ import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Metadata;
 import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.domain.TableOfContents;
 import nl.siegmann.epublib.epub.EpubReader;
 import android.util.Log;
 
@@ -79,6 +80,16 @@ public class EvilBook {
 		//year = year.replace(notMatch[0], "");
 		//year = year.replace(notMatch[1], "");
 		return year;
+	}
+	
+	/**
+	 * Gets number of TOC entries in the epub which is the the same as the
+	 *  number of chapters in it.
+	 * @return numberOfCahpters
+	 */
+	public int getNumberOfChapter() {
+		int aNumberOfChapters = this._Book.getTableOfContents().size();
+		return aNumberOfChapters;
 	}
 	
 	/**

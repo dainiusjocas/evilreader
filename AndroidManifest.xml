@@ -23,6 +23,7 @@
             android:theme="@android:style/Theme.Black" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -32,8 +33,12 @@
             android:theme="@android:style/Theme.Black" >
         </activity>
         <activity
-            android:name="com.evilreader.android.FilePickerActivity"
+            android:name="com.evilreader.android.filePicker.FilePickerActivity"
             android:label="@string/title_activity_file_picker" >
+        </activity>
+        <activity
+            android:name="com.evilreader.android.tableOfContents.ToCActivity"
+            android:label="@string/title_activity_to_c" >
         </activity>
     </application>
 

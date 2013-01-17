@@ -155,11 +155,13 @@ public class EvilLibraryManager {
 		authors = aEvilBook.getAuthors().trim();
 		title = aEvilBook.getTitle();
 		year = aEvilBook.getYear();
+		int numberOfChapters = aEvilBook.getNumberOfChapter();
 		filename = "Dummy";
 		path = pEvilPath;
 		
 		this._DBAdapter.open();
-		this._DBAdapter.storeEvilBook(title, authors, year, filename, path);
+		this._DBAdapter.storeEvilBook(title, authors, year,
+				"" + numberOfChapters, filename, path);
 		this._DBAdapter.close();
 	}
 	
@@ -184,11 +186,13 @@ public class EvilLibraryManager {
 			authors = aEvilBook.getAuthors().trim();
 			title = aEvilBook.getTitle();
 			year = aEvilBook.getYear();
+			int numberOfChapters = aEvilBook.getNumberOfChapter();
 			filename = evilBook;
 			path = anAbsolutePath;
 			
 			this._DBAdapter.open();
-			this._DBAdapter.storeEvilBook(title, authors, year, filename, path);
+			this._DBAdapter.storeEvilBook(title, authors, year,
+					"" + numberOfChapters, filename, path);
 			this._DBAdapter.close();
 		}
 	}
