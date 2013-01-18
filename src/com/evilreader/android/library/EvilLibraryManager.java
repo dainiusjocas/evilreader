@@ -24,7 +24,7 @@ public class EvilLibraryManager {
 	// Scanner for Evil Library
 	// TODO(dainius) I think this is only necessary when evilreader is actually 
 	// going to the filesystem. So not in constructor.
-	private EvilLibraryScanner _EvilLibraryScanner;
+	private FileSystemScanner _EvilLibraryScanner;
 	// List of evil books
 	private ArrayList<String> _ListOfEvilBooks = new ArrayList<String>();;
 	// Absolute path to the directory
@@ -47,7 +47,7 @@ public class EvilLibraryManager {
 		this._EvilLibraryDirectory = 
 				this.prepareDirectoryForEvilLibrary();
 		this._EvilLibraryScanner = 
-				new EvilLibraryScanner(this._EvilLibraryDirectory);
+				new FileSystemScanner(this._EvilLibraryDirectory);
 	}
 
 	/**

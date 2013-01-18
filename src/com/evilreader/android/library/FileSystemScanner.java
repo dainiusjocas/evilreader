@@ -9,10 +9,10 @@ import android.util.Log;
  * Purpose of this class is to scan default directory for ePubs. This class
  * assumes that directory already exists.
  * 
- * @author Dainius
+ * @author Dainius Jocas
  *
  */
-public class EvilLibraryScanner {
+public class FileSystemScanner {
 	private File _EvilLibraryDirectory;
 	
 	/**
@@ -20,7 +20,7 @@ public class EvilLibraryScanner {
 	 * 
 	 * @param evilLibraryDirectory - directory descriptor
 	 */
-	public EvilLibraryScanner(File evilLibraryDirectory) {
+	public FileSystemScanner(File evilLibraryDirectory) {
 		this._EvilLibraryDirectory = evilLibraryDirectory;
 	}
 	
