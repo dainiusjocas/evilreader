@@ -64,11 +64,12 @@ public class GemManager {
 	 * Puts note and its location to the database
 	 * @param pNote
 	 * @param pBookId
-	 * @param pChapter
+	 * @param pChapteractivity
 	 * @param pParagraph
 	 */
 	public void storeNote(String pNote, String pBookId, String pChapter, 
 			String pParagraph) {
+		
 		this._DBAdapter.open();
 		this._DBAdapter.storeNote(pNote, pBookId, pChapter, pParagraph);
 		this._DBAdapter.close();
@@ -112,7 +113,7 @@ public class GemManager {
 	 * @param pParagraph
 	 */
 	public void saveBookmark(String pBookId, String pChapter, 
-			String pParagraph) {
+			String pParagraph) {		
 		this._DBAdapter.open();
 		this._DBAdapter.storeBookmark(pBookId, pChapter, pParagraph);
 		this._DBAdapter.close();
@@ -144,6 +145,30 @@ public class GemManager {
 		aCursor.close();
 		this._DBAdapter.close();
 		return bookmarks;
+	}
+	
+	public int[] getBookmarkById(String bookmarkId){
+		int[] bookMark = new int[2];
+		bookMark[0] = Integer.parseInt(bookmarkId);
+		this._DBAdapter.open();
+		bookMark = this._DBAdapter.getLocationByBookmarkRowId(bookmarkId);
+		/*Cursor aCursor = this._DBAdapter.fetchBookmarks(pBookId);
+		if (!aCursor.moveToFirst()) {
+			aCursor.close();
+			this._DBAdapter.close();
+			return null;
+		}
+		do {
+			if(aCursor.getString(0) == bookmarkId){
+				bookMark[1] = Integer.parseInt(aCursor.getString(1));
+				bookMark[2] = Integer.parseInt(aCursor.getString(2));
+				break;
+			}
+		} while(aCursor.moveToNext());
+		
+		aCursor.close();*/
+		this._DBAdapter.close();
+		return bookMark;
 	}
 	
 	/**

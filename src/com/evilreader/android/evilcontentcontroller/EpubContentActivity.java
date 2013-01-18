@@ -4,16 +4,20 @@ import java.util.List;
 import java.util.Vector;
 
 import com.evilreader.android.R;
+import com.evilreader.android.library.LibraryActivity;
+import com.evilreader.android.tableOfContents.ToCActivity;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
@@ -22,13 +26,12 @@ import android.webkit.WebView;
 
 public class EpubContentActivity extends FragmentActivity {
 	// private constants
-	// TODO(Viktor): in the future we'll use more sophisticated techniques
+	// TODO(Viktor): in the future we'll use more sophisticated technique
 	private final int resourceIDSample = R.raw.asd;
 	private static int NUM_ITEMS = 0;
 
 	// private members
-	
-	//private ArrayList<EvilreaderWebView> webviewPages;
+	private GemManager gemManager;
 	private EvilreaderViewPager mViewPager;
 	private PagerAdapter mSectionsPagerAdapter;
 	private List<EvilWebViewFragment> fragments = new Vector<EvilWebViewFragment>();
@@ -56,7 +59,7 @@ public class EpubContentActivity extends FragmentActivity {
 		/*
 		 * Initiating managers
 		 * */
-		//GemManager.getInstance().Init(getApplicationContext());
+		this.gemManager = new GemManager(getApplicationContext(), this);
 		EbookContentManager.getInstance().Init(getApplicationContext(),this);
 		
 		/*
@@ -103,6 +106,52 @@ public class EpubContentActivity extends FragmentActivity {
 		getMenuInflater().inflate(R.menu.activity_epub_content, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
+
+	/**
+	 * Handles menu button clicks.
+	 */
+	public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+         switch (item.getItemId()) {
+         case R.id.table_of_content:
+        	 Intent aIntent = new Intent(this, ToCActivity.class);
+        	 Bundle extras = new Bundle();
+        	 extras.putString("evil_id", this.currentBookId);
+        	 aIntent.putExtras(extras);
+        	 startActivityForResult(aIntent, 2);
+         }
+         
+         return false;
+	}
+	
+	/*
+	 * Callback from the TOCActivity for goto workflow by chapternumber or bookmark
+	 * */
+	protected void onActivityResult(int requestCode, int resultCode,
+            Intent data) {
+        if (requestCode == 2) {
+            if (resultCode == RESULT_OK) {
+            	String bookmarkId = data.getExtras().getString("bookmark");
+            	String chapterId = data.getExtras().getString("chapter");
+            	
+            	if(bookmarkId != null && bookmarkId != ""){
+            		
+            		int[] bookMark = this.gemManager.getBookmarkById(bookmarkId);
+            		
+            		int pageNumber = EbookContentManager.getInstance().GetPageNumberByBookmark(bookMark);
+            		if(pageNumber != -1){
+            			this.mViewPager.setCurrentItem(pageNumber, true);
+            		}
+            	}
+            	else if(chapterId != null && chapterId != ""){
+            		int pageNumber = EbookContentManager.getInstance().GetPageNumberByChapterNumber(Integer.parseInt(chapterId));
+            		if(pageNumber != -1){
+            			this.mViewPager.setCurrentItem(pageNumber, true);
+            		}
+            	}
+            }
+        }
+    }
 	
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

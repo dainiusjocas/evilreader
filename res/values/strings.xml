@@ -20,5 +20,6 @@
     <string name="no_books">NO EVIL BOOKS IN THE LIBRARY</string>
     <string name="title_activity_file_picker">FilePickerActivity</string>
     <string name="title_activity_to_c">ToCActivity</string>
+    <string name="table_of_content">Table of contents</string>
 
 </resources>

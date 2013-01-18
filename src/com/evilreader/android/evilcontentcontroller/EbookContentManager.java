@@ -334,19 +334,39 @@ public class EbookContentManager {
 	
 	
 	/*
-	 * Finds the content of the page for which the parameters are according 
-	 * Viktor ToDo: redesign the params
+	 * Finds the content of the page for which the parameters are according
 	 * */
-	public String GetPageByBookmark(){
+	public int GetPageNumberByBookmark(int[] bookMark){
 		
 		if (currentEbookContentWithinChaptersAndPages != null
 				&& currentPageNumberIndex >= 0) {
-			String buffer = "";
-						
-			return buffer;
+			for (int i = 1; i <= currentEbookContentWithinChaptersAndPages.size(); i++) {
+				if(bookMark[1] == this.currentEbookContentWithinChaptersAndPages.get(i).second.get(0)){
+					currentPageNumberIndex = i-1;
+					currentChapterNumberIndex = bookMark[0];
+					return currentPageNumberIndex;
+				}
+			}			
 		}
 
-		return "";
+		return -1;
+	}
+	
+	public int GetPageNumberByChapterNumber(int chapterNumber){
+		if (currentEbookContentWithinChaptersAndPages != null
+				&& currentPageNumberIndex >= 0) {
+			for (int i = 1; i <= currentEbookContentWithinChaptersAndPages.size(); i++) {
+				if(chapterNumber == this.currentEbookContentWithinChaptersAndPages.get(i).first){
+					currentPageNumberIndex = i;
+					currentChapterNumberIndex = chapterNumber;
+					return currentPageNumberIndex;
+				}
+			}
+			
+			
+		}
+		
+		return -1;
 	}
 
 	/*
