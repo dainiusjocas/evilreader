@@ -47,6 +47,7 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 	private static final String TAG = "EvilreaderWebView";
 	// Context.
 	protected Context ctx;
+	private Activity currentActivity;
 	// The previously selected region.
 	protected Region lastSelectedRegion = null;
 	// The drag layer for selection.
@@ -102,6 +103,7 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		this.ctx = context;
 		this.setup(context);
 		this.gemManager = new GemManager(context, currentActivity);
+		this.currentActivity = currentActivity;
 	}
 
 	/*
@@ -126,6 +128,10 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		this.ctx = context;
 		this.setup(context);
 		this.gemManager = new GemManager(context, null);
+	}
+	
+	public void SetCurrentActivity(Activity activity){
+		this.currentActivity = activity;
 	}
 
 	@SuppressLint("SetJavaScriptEnabled")
@@ -589,7 +595,7 @@ public class EvilreaderWebView extends WebView implements OnLongClickListener,
 		        }
 				
 				else if (actionId == 4) { 
-					DictionaryChecker.translateWord(selectedText, ctx);
+					DictionaryChecker.translateWord(selectedText, currentActivity);
 		        }
 		        				
 				contextMenuVisible = false;					
